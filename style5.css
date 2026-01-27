@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
+
+:root {
+    --primary-green: #85C38C;
+    --dark-green: #68a36f;
+    --light-bg-green: #D1F2D3;
+    --text-dark: #2D4A31;
+    --sidebar-width: 280px;
+}
+
+body {
+    font-family: 'Sarabun', 'Montserrat', sans-serif;
+    margin: 0;
+    background-color: #f9fbf9;
+}
+
+/* --- Sidebar Styles --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--primary-green);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 2rem 1rem;
+    z-index: 100;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    /* Effect Menu: Smooth Transition */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Effect Menu Hover: Slide Right + Change Color + Shadow */
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateX(10px);
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
+}
+
+.nav-link.active {
+    background-color: white;
+    color: var(--text-dark);
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transform: translateX(5px);
+}
+
+/* --- Main Content --- */
+.main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.header {
+    height: 70px;
+    background-color: var(--primary-green); /* Header สีเดียวกับ Sidebar */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 40px;
+    width: 100%;
+}
+
+.user-icon {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.user-icon:hover {
+    transform: scale(1.1);
+}
+
+/* --- Search & Filters --- */
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+.search-input:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(133, 195, 140, 0.2);
+}
+
+.filter-select {
+    padding: 10px 25px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s;
+}
+.filter-select:hover, .filter-select:focus {
+    border-color: var(--primary-green);
+}
+
+/* --- Cattle Grid --- */
+.cattle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.cattle-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #f0f0f0;
+    overflow: hidden; 
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+/* Effect Card Hover: Float Up */
+.cattle-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    border-color: var(--primary-green);
+}
+
+/* --- Image Zoom Effect --- */
+.card-img {
+    /* Transition for zoom */
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* เมื่อเมาส์ชี้ที่การ์ด ให้รูปขยาย */
+.cattle-card:hover .card-img {
+    transform: scale(1.12);
+}
+
+.info-section {
+    background-color: var(--light-bg-green);
+    margin: 0 15px 15px 15px;
+    padding: 20px;
+    border-radius: 15px;
+    color: var(--text-dark);
+}
+
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 20px 20px 20px;
+}
+
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.action-btn.delete:hover {
+    background-color: #FF8A80;
+    border-color: #FF8A80;
+}
+
+/* Floating Button */
+.add-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    width: 65px;
+    height: 65px;
+    background-color: #4ade80;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(74, 222, 128, 0.4);
+    z-index: 50;
+    transition: all 0.3s;
+}
+.add-btn:hover {
+    transform: scale(1.1);
+    background-color: #22c55e;
+}

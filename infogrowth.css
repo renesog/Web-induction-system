@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
+
+:root {
+    --primary-green: #85C38C;
+    --light-bg-green: #D1F2D3; /* ปรับให้ตรงกับภาพตัวอย่าง */
+    --text-dark: #2D4A31;
+    --sidebar-width: 280px;
+}
+
+body {
+    font-family: 'Sarabun', 'Montserrat', sans-serif;
+    margin: 0;
+    background-color: #f9fbf9;
+}
+
+/* Sidebar คงที่ด้านซ้าย */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--primary-green);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 2rem 1rem;
+    z-index: 100;
+}
+
+.nav-link {
+    display: block;
+    padding: 12px 20px;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+}
+
+.nav-link.active {
+    background-color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Main Content ขยับตามความกว้าง Sidebar */
+.main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+}
+
+.header {
+    height: 70px;
+    background-color: var(--primary-green);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 40px;
+    width: 100%;
+}
+
+.user-icon {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+/* Search & Filters */
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    outline: none;
+}
+
+.filter-select {
+    padding: 10px 25px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    background: white;
+}
+
+/* Cattle Grid */
+.cattle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+.cattle-card {
+    background: white;
+    border-radius: 20px;
+    border: 1.5px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+.info-section {
+    background-color: var(--light-bg-green);
+    margin: 0 15px 15px 15px;
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 0.95rem;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px 20px 20px;
+}
+
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+
+.action-btn.delete {
+    background-color: #FF8A80;
+    border: none;
+    color: white;
+}
+
+/* Floating Button */
+.add-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    width: 65px;
+    height: 65px;
+    background-color: #4ade80;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    font-size: 35px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
