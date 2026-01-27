@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูลสุขภาพและการดูแล - Induction System</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <link rel="stylesheet" href="style5.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="flex bg-[#f9fbf9]">
 
     <aside class="sidebar">
@@ -20,36 +24,66 @@
         </div>
         <nav class="space-y-2 px-2">
             <a href="index.html" class="nav-link"><i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก</a>
-            <a href="cattle_info.html" class="nav-link"><i class="fa-solid fa-cow w-6 text-center mr-2"></i> บันทึกข้อมูลโค</a>
-            <a href="feeding.html" class="nav-link"><i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i> ข้อมูลการให้อาหาร</a>
-            <a href="growth.html" class="nav-link"><i class="fa-solid fa-chart-line w-6 text-center mr-2"></i> ข้อมูลการเจริญเติบโต</a>
-            <a href="health.html" class="nav-link active"><i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i> ข้อมูลสุขภาพและการดูแล</a>
+            <a href="cattle_info.html" class="nav-link"><i class="fa-solid fa-cow w-6 text-center mr-2"></i>
+                บันทึกข้อมูลโค</a>
+            <a href="feeding.html" class="nav-link"><i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i>
+                ข้อมูลการให้อาหาร</a>
+            <a href="growth.html" class="nav-link"><i class="fa-solid fa-chart-line w-6 text-center mr-2"></i>
+                ข้อมูลการเจริญเติบโต</a>
+            <a href="health.html" class="nav-link active"><i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i>
+                ข้อมูลสุขภาพและการดูแล</a>
         </nav>
     </aside>
 
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <main class="main-content">
         <header class="header shadow-sm relative z-50">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <div class="relative">
-                <button id="profileBtn" class="user-icon shadow-md cursor-pointer hover:bg-gray-50 transition focus:outline-none"><i class="fa-regular fa-user text-gray-600"></i></button>
-                <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl py-2 border border-gray-100 transform origin-top-right transition-all">
-                    <a href="profile.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition"><i class="fa-regular fa-circle-user mr-3 text-lg"></i> <span class="font-medium">โปรไฟล์</span></a>
+                <button id="profileBtn"
+                    class="user-icon shadow-md cursor-pointer hover:bg-gray-50 transition focus:outline-none">
+                    <i class="fa-regular fa-user text-gray-600"></i>
+                </button>
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl py-2 border border-gray-100 transform origin-top-right transition-all">
+                    <a href="profile.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition">
+                        <i class="fa-regular fa-circle-user mr-3 text-lg"></i>
+                        <span class="font-medium">โปรไฟล์</span>
+                    </a>
                     <div class="border-t border-gray-100 my-1"></div>
-                    <a href="login.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition"><i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i> <span class="font-medium">ออกจากระบบ</span></a>
+                    <a href="login.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i>
+                        <span class="font-medium">ออกจากระบบ</span>
+                    </a>
                 </div>
             </div>
         </header>
 
         <div class="p-8">
             <div class="max-w-5xl mx-auto mb-8">
-                <h1 class="text-3xl font-bold text-[#2D4A31] mb-6 border-l-8 border-[#85C38C] pl-4">ข้อมูลสุขภาพและการดูแล</h1>
-                
+                <h1 class="text-3xl font-bold text-[#2D4A31] mb-6 border-l-8 border-[#85C38C] pl-4">
+                    ข้อมูลสุขภาพและการดูแล</h1>
+
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
                     <div class="relative mb-4">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" id="searchInput" placeholder="ค้นหาด้วย ID หรือ ชื่อโค..." class="w-full p-2 border rounded-lg pl-10 shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="searchInput" placeholder="ค้นหาด้วย ID หรือ ชื่อโค..."
+                            class="w-full p-2 border rounded-lg pl-10 shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none">
                     </div>
                     <div class="flex flex-wrap gap-4">
-                        <select id="statusFilter" class="p-2 border rounded-lg bg-white min-w-[180px] shadow-sm focus:ring-2 focus:ring-green-400 cursor-pointer">
+                        <select id="statusFilter"
+                            class="p-2 border rounded-lg bg-white min-w-[180px] shadow-sm focus:ring-2 focus:ring-green-400 cursor-pointer">
                             <option value="all">สถานะสุขภาพ (ทั้งหมด)</option>
                             <option value="ปกติ">ปกติ (Normal)</option>
                             <option value="ป่วย">ป่วย (Sick)</option>
@@ -63,19 +97,23 @@
             </div>
         </div>
 
-        <button onclick="toggleModal()" class="fixed bottom-8 right-8 w-16 h-16 bg-[#4ade80] text-white text-4xl rounded-full shadow-lg hover:bg-[#22c55e] hover:scale-110 transition-all flex items-center justify-center z-40">
+        <button onclick="toggleModal()"
+            class="fixed bottom-8 right-8 w-16 h-16 bg-[#4ade80] text-white text-4xl rounded-full shadow-lg hover:bg-[#22c55e] hover:scale-110 transition-all flex items-center justify-center z-40">
             <i class="fa-solid fa-plus"></i>
         </button>
     </main>
 
-    <div id="healthModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-[200] p-4">
+    <div id="healthModal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-[200] p-4">
         <div class="bg-white rounded-[30px] w-full max-w-5xl p-10 relative shadow-2xl overflow-y-auto max-h-[90vh]">
             <h2 class="text-2xl font-bold mb-8 text-center text-[#2D4A31]">บันทึกข้อมูลสุขภาพ</h2>
-            
+
             <div class="flex flex-col md:flex-row gap-10">
                 <div class="w-full md:w-1/3">
-                    <div class="w-full aspect-square bg-gray-100 rounded-3xl flex items-center justify-center border-2 border-gray-200 relative overflow-hidden shadow-inner">
-                        <img id="healthPreview" src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png" class="absolute inset-0 w-full h-full object-cover">
+                    <div
+                        class="w-full aspect-square bg-gray-100 rounded-3xl flex items-center justify-center border-2 border-gray-200 relative overflow-hidden shadow-inner">
+                        <img id="healthPreview" src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png"
+                            class="absolute inset-0 w-full h-full object-cover">
                     </div>
                     <p class="text-center text-xs text-gray-400 mt-2 italic">* รูปภาพดึงจากฐานข้อมูลหลัก</p>
                 </div>
@@ -84,17 +122,25 @@
                     <div class="col-span-full bg-blue-50 p-4 rounded-xl border border-blue-100 mb-2">
                         <label class="font-bold text-blue-800">ค้นหา ID โค :</label>
                         <div class="flex gap-2 mt-1">
-                            <input type="text" id="inputID" placeholder="กรอก ID ที่นี่..." class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                            <button onclick="pullData()" class="bg-blue-600 text-white px-4 rounded-lg font-bold hover:bg-blue-700 transition shadow-sm"><i class="fa-solid fa-download mr-1"></i> ดึงข้อมูล</button>
+                            <input type="text" id="inputID" placeholder="กรอก ID ที่นี่..."
+                                class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                            <button onclick="pullData()"
+                                class="bg-blue-600 text-white px-4 rounded-lg font-bold hover:bg-blue-700 transition shadow-sm"><i
+                                    class="fa-solid fa-download mr-1"></i> ดึงข้อมูล</button>
                         </div>
                     </div>
 
-                    <div class="space-y-1"><label class="font-bold text-gray-700">ชื่อ/ฉายา :</label><input type="text" id="inputName" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" readonly></div>
-                    <div class="space-y-1"><label class="font-bold text-gray-700">สายพันธุ์ :</label><input type="text" id="inputBreed" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" readonly></div>
-                    
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ชื่อ/ฉายา :</label><input type="text"
+                            id="inputName" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" readonly>
+                    </div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">สายพันธุ์ :</label><input type="text"
+                            id="inputBreed" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed"
+                            readonly></div>
+
                     <div class="border-t border-gray-200 col-span-full my-2"></div>
 
-                    <div class="space-y-1"><label class="font-bold text-green-700">วันที่ตรวจ/รักษา :</label><input type="date" id="inputDate" class="w-full p-2 border rounded-lg cursor-pointer"></div>
+                    <div class="space-y-1"><label class="font-bold text-green-700">วันที่ตรวจ/รักษา :</label><input
+                            type="date" id="inputDate" class="w-full p-2 border rounded-lg cursor-pointer"></div>
                     <div class="space-y-1"><label class="font-bold text-gray-700">สถานะสุขภาพ :</label>
                         <select id="inputStatus" class="w-full p-2 border rounded-lg bg-white">
                             <option value="ปกติ">ปกติ (Normal)</option>
@@ -103,17 +149,25 @@
                             <option value="เฝ้าระวัง">เฝ้าระวัง (Watch)</option>
                         </select>
                     </div>
-                    <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">อาการ/โรคที่พบ :</label><input type="text" id="inputSymptoms" placeholder="เช่น ซึม, ไม่กินหญ้า, ขาเจ็บ" class="w-full p-2 border rounded-lg"></div>
-                    <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">การรักษา/ยาที่ให้ :</label><input type="text" id="inputTreatment" placeholder="เช่น ฉีดยาแก้อักเสบ, ให้วิตามิน" class="w-full p-2 border rounded-lg"></div>
-                    
-                    <div class="space-y-1"><label class="font-bold text-gray-700">ค่าใช้จ่าย (บาท) :</label><input type="number" id="inputCost" class="w-full p-2 border rounded-lg" placeholder="0"></div>
-                    <div class="space-y-1"><label class="font-bold text-gray-700">สัตวแพทย์/ผู้ตรวจ :</label><input type="text" id="inputOfficer" class="w-full p-2 border rounded-lg"></div>
+                    <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">อาการ/โรคที่พบ
+                            :</label><input type="text" id="inputSymptoms" placeholder="เช่น ซึม, ไม่กินหญ้า, ขาเจ็บ"
+                            class="w-full p-2 border rounded-lg"></div>
+                    <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">การรักษา/ยาที่ให้
+                            :</label><input type="text" id="inputTreatment"
+                            placeholder="เช่น ฉีดยาแก้อักเสบ, ให้วิตามิน" class="w-full p-2 border rounded-lg"></div>
+
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ค่าใช้จ่าย (บาท) :</label><input
+                            type="number" id="inputCost" class="w-full p-2 border rounded-lg" placeholder="0"></div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">สัตวแพทย์/ผู้ตรวจ :</label><input
+                            type="text" id="inputOfficer" class="w-full p-2 border rounded-lg"></div>
                 </div>
             </div>
 
             <div class="mt-8 flex justify-center gap-4">
-                <button onclick="toggleModal()" class="px-8 py-2 bg-gray-400 text-white rounded-full hover:bg-gray-500 transition">ยกเลิก</button>
-                <button onclick="saveHealthData()" class="px-12 py-2 bg-[#0b5c13] text-white rounded-full font-bold shadow-md hover:bg-[#08450e] transition transform hover:scale-105">บันทึกข้อมูล</button>
+                <button onclick="toggleModal()"
+                    class="px-8 py-2 bg-gray-400 text-white rounded-full hover:bg-gray-500 transition">ยกเลิก</button>
+                <button onclick="saveHealthData()"
+                    class="px-12 py-2 bg-[#0b5c13] text-white rounded-full font-bold shadow-md hover:bg-[#08450e] transition transform hover:scale-105">บันทึกข้อมูล</button>
             </div>
         </div>
     </div>
@@ -122,7 +176,7 @@
         // --- 1. Dropdown & Initial ---
         const profileBtn = document.getElementById('profileBtn');
         const profileDropdown = document.getElementById('profileDropdown');
-        if(profileBtn && profileDropdown) {
+        if (profileBtn && profileDropdown) {
             profileBtn.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.classList.toggle('hidden'); });
             document.addEventListener('click', (e) => { if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) { profileDropdown.classList.add('hidden'); } });
         }
@@ -136,20 +190,20 @@
             const tid = document.getElementById('inputID').value;
             const mainData = JSON.parse(localStorage.getItem('cattleMainData')) || [];
             const cow = mainData.find(c => c.id === tid);
-            
-            if(cow) {
+
+            if (cow) {
                 // เติมข้อมูลอัตโนมัติ
                 document.getElementById('inputName').value = cow.name;
                 document.getElementById('inputBreed').value = cow.breed;
-                
+
                 // ดึงรูปภาพ
-                currentCowImage = cow.image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png"; 
+                currentCowImage = cow.image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
                 document.getElementById('healthPreview').src = currentCowImage;
-                
+
                 // แจ้งเตือนเล็กน้อย (Optional)
                 // alert("ดึงข้อมูล " + cow.name + " สำเร็จ!");
-            } else { 
-                alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก กรุณาตรวจสอบอีกครั้ง"); 
+            } else {
+                alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก กรุณาตรวจสอบอีกครั้ง");
                 document.getElementById('inputName').value = "";
                 document.getElementById('inputBreed').value = "";
                 document.getElementById('healthPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
@@ -159,14 +213,14 @@
         // --- 3. CRUD Logic ---
         function toggleModal() {
             document.getElementById('healthModal').classList.toggle('hidden');
-            if(document.getElementById('healthModal').classList.contains('hidden')) { editId = null; clearForm(); }
+            if (document.getElementById('healthModal').classList.contains('hidden')) { editId = null; clearForm(); }
         }
 
         function saveHealthData() {
             const id = document.getElementById('inputID').value;
             const name = document.getElementById('inputName').value;
-            
-            if(!id || !name) return alert("กรุณาระบุ ID และกดปุ่ม 'ดึงข้อมูล' ก่อนบันทึก");
+
+            if (!id || !name) return alert("กรุณาระบุ ID และกดปุ่ม 'ดึงข้อมูล' ก่อนบันทึก");
 
             const record = {
                 id: id,
@@ -183,14 +237,14 @@
             };
 
             let list = JSON.parse(localStorage.getItem('cattleHealthData')) || [];
-            
-            if(editId) { 
-                const idx = list.findIndex(r => r.recordId === editId); 
-                if(idx !== -1) list[idx] = { ...record, recordId: editId }; // Keep original recordId
-            } else { 
-                list.push(record); 
+
+            if (editId) {
+                const idx = list.findIndex(r => r.recordId === editId);
+                if (idx !== -1) list[idx] = { ...record, recordId: editId }; // Keep original recordId
+            } else {
+                list.push(record);
             }
-            
+
             localStorage.setItem('cattleHealthData', JSON.stringify(list));
             filterHealthData(); toggleModal();
         }
@@ -198,9 +252,9 @@
         function renderCard(rec) {
             // กำหนดสีตามสถานะ
             let statusColor = "bg-gray-100 text-gray-600";
-            if(rec.status === "ปกติ") statusColor = "bg-green-100 text-green-700";
-            if(rec.status === "ป่วย") statusColor = "bg-red-100 text-red-700";
-            if(rec.status === "เฝ้าระวัง") statusColor = "bg-orange-100 text-orange-700";
+            if (rec.status === "ปกติ") statusColor = "bg-green-100 text-green-700";
+            if (rec.status === "ป่วย") statusColor = "bg-red-100 text-red-700";
+            if (rec.status === "เฝ้าระวัง") statusColor = "bg-orange-100 text-orange-700";
 
             const html = `
                 <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col">
@@ -234,9 +288,9 @@
             const s = document.getElementById('searchInput').value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
             let list = JSON.parse(localStorage.getItem('cattleHealthData')) || [];
-            
+
             document.getElementById('healthGrid').innerHTML = '';
-            
+
             const filtered = list.filter(r => {
                 const matchSearch = r.id.toLowerCase().includes(s) || r.name.toLowerCase().includes(s) || r.symptoms.toLowerCase().includes(s);
                 const matchStatus = status === 'all' || r.status === status;
@@ -257,7 +311,7 @@
         function editCard(recordId) {
             const list = JSON.parse(localStorage.getItem('cattleHealthData')) || [];
             const rec = list.find(r => r.recordId === recordId);
-            if(rec) {
+            if (rec) {
                 editId = recordId;
                 document.getElementById('inputID').value = rec.id;
                 document.getElementById('inputName').value = rec.name;
@@ -275,7 +329,7 @@
         }
 
         function deleteCard(recordId) {
-            if(confirm("ต้องการลบประวัติสุขภาพรายการนี้หรือไม่?")) {
+            if (confirm("ต้องการลบประวัติสุขภาพรายการนี้หรือไม่?")) {
                 let list = JSON.parse(localStorage.getItem('cattleHealthData')) || [];
                 list = list.filter(r => r.recordId !== recordId);
                 localStorage.setItem('cattleHealthData', JSON.stringify(list));
@@ -290,6 +344,26 @@
 
         document.getElementById('searchInput').addEventListener('input', filterHealthData);
         document.getElementById('statusFilter').addEventListener('change', filterHealthData);
+
+        // Sidebar Toggle Functions
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.remove('sidebar-open');
+                }
+            });
+        });
     </script>
 </body>
+
 </html>
