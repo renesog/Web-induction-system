@@ -14,7 +14,6 @@ body {
     background-color: #f9fbf9;
 }
 
-/* --- Sidebar Styles --- */
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--primary-green);
@@ -36,11 +35,9 @@ body {
     border-radius: 999px;
     margin-bottom: 8px;
     font-size: 1rem;
-    /* Effect Menu: Smooth Transition */
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Effect Menu Hover: Slide Right + Change Color + Shadow */
 .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
@@ -56,7 +53,7 @@ body {
     transform: translateX(5px);
 }
 
-/* --- Main Content --- */
+
 .main-content {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
@@ -67,12 +64,14 @@ body {
 .header {
     height: 70px;
     background-color: var(--primary-green);
-    /* Header สีเดียวกับ Sidebar */
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding: 0 40px;
     width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
 .user-icon {
@@ -92,7 +91,6 @@ body {
     transform: scale(1.1);
 }
 
-/* --- Search & Filters --- */
 .search-input {
     width: 100%;
     padding: 12px 20px;
@@ -124,7 +122,7 @@ body {
     border-color: var(--primary-green);
 }
 
-/* --- Cattle Grid --- */
+
 .cattle-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -140,20 +138,16 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 }
 
-/* Effect Card Hover: Float Up */
 .cattle-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
     border-color: var(--primary-green);
 }
 
-/* --- Image Zoom Effect --- */
 .card-img {
-    /* Transition for zoom */
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* เมื่อเมาส์ชี้ที่การ์ด ให้รูปขยาย */
 .cattle-card:hover .card-img {
     transform: scale(1.12);
 }
@@ -196,7 +190,7 @@ body {
     border-color: #FF8A80;
 }
 
-/* Floating Button */
+
 .add-btn {
     position: fixed;
     bottom: 30px;
@@ -219,9 +213,6 @@ body {
     background-color: #22c55e;
 }
 
-/* ========================================
-   HAMBURGER MENU BUTTON
-   ======================================== */
 .hamburger-btn {
     display: none;
     flex-direction: column;
@@ -253,7 +244,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Hamburger animation when open */
 body.sidebar-open .hamburger-btn span:nth-child(1) {
     transform: rotate(45deg) translate(5px, 5px);
 }
@@ -266,9 +256,6 @@ body.sidebar-open .hamburger-btn span:nth-child(3) {
     transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* ========================================
-   SIDEBAR OVERLAY
-   ======================================== */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -287,9 +274,6 @@ body.sidebar-open .sidebar-overlay {
     opacity: 1;
 }
 
-/* ========================================
-   TABLET RESPONSIVE (768px - 1024px)
-   ======================================== */
 @media (max-width: 1024px) {
     :root {
         --sidebar-width: 240px;
@@ -315,20 +299,17 @@ body.sidebar-open .sidebar-overlay {
     }
 }
 
-/* ========================================
-   MOBILE RESPONSIVE (< 768px)
-   ======================================== */
 @media (max-width: 768px) {
     :root {
         --sidebar-width: 280px;
     }
 
-    /* Show hamburger button */
     .hamburger-btn {
         display: flex;
     }
 
-    /* Sidebar hidden by default on mobile */
+
+
     .sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
@@ -336,47 +317,64 @@ body.sidebar-open .sidebar-overlay {
         z-index: 100;
     }
 
-    /* Show sidebar when body has .sidebar-open class */
+
+
     body.sidebar-open .sidebar {
         transform: translateX(0);
     }
 
-    /* Main content takes full width */
+
+
     .main-content {
         margin-left: 0;
         width: 100%;
     }
 
-    /* Header adjustments */
+
+
     .header {
         justify-content: space-between;
         padding: 0 15px;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0;
+        right: 0;
+        z-index: 90 !important;
+        height: 70px;
+        background-color: var(--primary-green);
     }
 
-    /* Content padding adjustments */
+    .main-content {
+        padding-top: 80px !important;
+    }
+
     .main-content .p-8 {
         padding: 1rem !important;
     }
 
-    /* Form modal adjustments */
+
+
     .max-w-5xl {
         max-width: 100% !important;
     }
 
-    /* Grid adjustments for cards */
+
+
     .cattle-grid,
     [id$="Grid"] {
         grid-template-columns: 1fr !important;
     }
 
-    /* Modal adjustments */
+
+
     [class*="rounded-[30px]"] {
         border-radius: 20px !important;
         padding: 1.5rem !important;
         margin: 0.5rem !important;
     }
 
-    /* Add button positioning */
+
+
     .add-btn {
         bottom: 20px !important;
         right: 20px !important;
@@ -384,17 +382,15 @@ body.sidebar-open .sidebar-overlay {
         height: 56px !important;
     }
 
-    /* Title adjustments */
+
+
     .text-3xl {
         font-size: 1.5rem !important;
     }
 
-    /* Form grid in modals - handled by Tailwind's responsive classes */
+
 }
 
-/* ========================================
-   SMALL MOBILE (< 480px)
-   ======================================== */
 @media (max-width: 480px) {
     .header {
         height: 60px;
@@ -416,7 +412,7 @@ body.sidebar-open .sidebar-overlay {
         padding: 0.75rem !important;
     }
 
-    /* Filter selects */
+
     .flex.gap-4.flex-col.md\\:flex-row,
     .flex.flex-wrap.gap-4 {
         flex-direction: column !important;

@@ -1,17 +1,16 @@
-/* Layout Adjustment */
 .main-container {
   grid-area: main;
   padding: 30px;
-  background-color: #ffffff; /* Background ด้านนอกเป็นสีขาว */
+  background-color: #ffffff;
+
 }
 
-/* Profile Header Card */
 .profile-header-card {
   background: white;
   border-radius: 20px;
   padding: 20px 40px;
   margin-bottom: 25px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border: 1px solid #ddd;
 }
 
@@ -27,20 +26,19 @@
 }
 
 .user-email-text {
-  font-family: 'serif'; /* ให้ดูเหมือนในรูป */
+  font-family: 'serif';
   color: #888;
   font-size: 1.1rem;
 }
 
-/* Green Form Container */
 .form-container {
-  background-color: #A8D5BA; /* สีเขียวอ่อนตามรูป */
+  background-color: #A8D5BA;
   border-radius: 25px;
   padding: 40px;
-  position: relative; /* สำหรับวางรูปวัว/หญ้า */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   min-height: 450px;
-  
+
 }
 
 .form-grid {
@@ -63,7 +61,7 @@
   display: flex;
   align-items: center;
   padding: 5px 15px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .input-wrapper input {
@@ -81,27 +79,32 @@
   cursor: pointer;
 }
 
-/* Buttons */
+
+
+
 
 
 .form-footer {
   display: flex;
-  justify-content: center; 
-  align-items: center;     
-  width: 100%;             
-  margin-top: 50px;        
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 50px;
   padding: 20px;
   text-decoration: none;
-  
+
 }
-.save-btn:active{
-    transform: translate(2px);
-    box-shadow: 0 2px 0 #1e7e34;
+
+.save-btn:active {
+  transform: translate(2px);
+  box-shadow: 0 2px 0 #1e7e34;
 }
-.save-btn:hover{
-    transform: scale(1.1);
-    transition: 0.5s;
+
+.save-btn:hover {
+  transform: scale(1.1);
+  transition: 0.5s;
 }
+
 .save-btn {
   background-color: #28a745;
   color: white;
@@ -115,7 +118,6 @@
 
 }
 
-/* Decorative Stickers */
 .deco-grass {
   position: absolute;
   bottom: 10px;
@@ -131,7 +133,6 @@
   width: 120px;
 }
 
-/* Responsive */
 @media screen and (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;

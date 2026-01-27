@@ -1,4 +1,4 @@
-// SIDEBAR TOGGLE
+
 
 let sidebarOpen = false;
 const sidebar = document.getElementById('sidebar');
@@ -17,9 +17,10 @@ function closeSidebar() {
   }
 }
 
-// ---------- CHARTS ----------
 
-// BAR CHART
+
+
+
 const barChartOptions = {
   series: [
     {
@@ -64,7 +65,7 @@ const barChart = new ApexCharts(
 );
 barChart.render();
 
-// AREA CHART
+
 const areaChartOptions = {
   series: [
     {
