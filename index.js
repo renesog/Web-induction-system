@@ -1,90 +1,26 @@
-// --- 1. PROFILE DROPDOWN LOGIC ---
-const profileBtn = document.getElementById('profileBtn');
-const profileDropdown = document.getElementById('profileDropdown');
+const express = require('express');
+const path = require('path');
+const app = express(); 
 
-if(profileBtn && profileDropdown) {
-    profileBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        profileDropdown.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-            profileDropdown.classList.add('hidden');
-        }
-    });
-}
-
-// --- 2. BAR CHART (Cattle breeds) ---
-var barChartOptions = {
-  series: [{
-    name: 'จำนวน (ตัว)', // แปลภาษาไทย
-    data: [10, 8, 6, 4, 2]
-  }],
-  chart: {
-    type: 'bar',
-    height: 350,
-    toolbar: { show: false },
-    fontFamily: 'Sarabun, sans-serif' // ใช้ Font ไทย
-  },
-  colors: ["#2962ff", "#d50000", "#2e7d32", "#ff6d00", "#583cb3"],
-  plotOptions: {
-    bar: {
-      distributed: true,
-      borderRadius: 4,
-      horizontal: false,
-      columnWidth: '40%',
-    }
-  },
-  dataLabels: { enabled: false },
-  legend: { show: false },
-  xaxis: {
-    categories: ["แองกัส", "บราห์มัน", "ชาร์โรเล่ส์", "ลิมูซิน", "ซิมเมนทอล"], // แปลชื่อพันธุ์โคเป็นไทย (ถ้าต้องการ)
-    labels: { style: { fontSize: '12px' } }
-  },
-  yaxis: { title: { text: "จำนวน (ตัว)" } }
-};
-
-var barChart = new ApexCharts(document.querySelector("#bar-chart"), barChartOptions);
-barChart.render();
+const hostname = '127.0.0.1';
+const port = 3000;
 
 
-// --- 3. AREA CHART (Purchase & Sales) ---
-var areaChartOptions = {
-  series: [{
-    name: 'คำสั่งซื้อ', // แปลภาษาไทย
-    data: [31, 40, 28, 51, 42, 109, 100]
-  }, {
-    name: 'คำสั่งขาย', // แปลภาษาไทย
-    data: [11, 62, 90, 65, 68, 105, 85]
-  }],
-  chart: {
-    height: 350,
-    type: 'area',
-    toolbar: { show: false },
-    fontFamily: 'Sarabun, sans-serif'
-  },
-  colors: ["#583cb3", "#2962ff"],
-  dataLabels: { enabled: false },
-  stroke: { curve: 'smooth', width: 2 },
-  fill: {
-    type: 'gradient',
-    gradient: {
-      shadeIntensity: 1,
-      opacityFrom: 0.7,
-      opacityTo: 0.9,
-      stops: [0, 90, 100]
-    }
-  },
-  xaxis: {
-    categories: ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค."], // แปลเดือนเป็นไทย
-  },
-  yaxis: [
-    { title: { text: 'คำสั่งซื้อ' } },
-    { opposite: true, title: { text: 'คำสั่งขาย' } },
-  ],
-  tooltip: { shared: true, intersect: false }
-};
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'web')));
 
-var areaChart = new ApexCharts(document.querySelector("#area-chart"), areaChartOptions);
-areaChart.render();
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+app.get('/', (req, res) => {
+
+    res.sendFile(path.join(__dirname, 'web', 'login.html'));
+});
+
+ 
+app.listen(port, hostname, () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
+});
