@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="style5.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="auth.js"></script>
 </head>
 
 <body class="flex bg-[#f9fbf9]">
@@ -95,15 +96,7 @@
                             <option value="แองกัส">แองกัส</option>
                             <option value="ชาร์โรเล่ส์">ชาร์โรเล่ส์</option>
                         </select>
-                        <select id="recorderFilter"
-                            class="p-2 border rounded-lg bg-white min-w-[200px] shadow-sm focus:ring-2 focus:ring-green-400 cursor-pointer">
-                            <option value="all">ผู้บันทึกข้อมูล (ทั้งหมด)</option>
-                            <option value="นายสิทธิโชค จุ้ยขาว">นายสิทธิโชค จุ้ยขาว</option>
-                            <option value="นายศุภกิตติ์ เสาร์แก้ว">นายศุภกิตติ์ เสาร์แก้ว</option>
-                            <option value="นางสาวอภิธยา วิริยะ">นางสาวอภิธยา วิริยะ</option>
-                            <option value="นายจิรพันฒ์ รัศสุวรรณ">นายจิรพันฒ์ รัศสุวรรณ</option>
-                            <option value="ลุงสำราญ ปราณบุรี">ลุงสำราญ ปราณบุรี</option>
-                        </select>
+
                     </div>
                 </div>
 
@@ -320,13 +313,11 @@
         function filterGrowthData() {
             const s = document.getElementById('searchInput').value.toLowerCase();
             const b = document.getElementById('breedFilter').value;
-            const r = document.getElementById('recorderFilter').value;
             let list = JSON.parse(localStorage.getItem('cattleGrowthData')) || [];
             document.getElementById('growthGrid').innerHTML = '';
 
             const filtered = list.filter(c => (c.id.toLowerCase().includes(s) || (c.name && c.name.toLowerCase().includes(s))) &&
-                (b === 'all' || c.breed === b) &&
-                (r === 'all' || c.recorder === r));
+                (b === 'all' || c.breed === b));
 
             if (filtered.length === 0) {
                 document.getElementById('growthGrid').innerHTML = `
@@ -365,7 +356,6 @@
         }
         document.getElementById('searchInput').addEventListener('input', filterGrowthData);
         document.getElementById('breedFilter').addEventListener('change', filterGrowthData);
-        document.getElementById('recorderFilter').addEventListener('change', filterGrowthData);
 
         // Sidebar Toggle Functions
         function toggleSidebar() {

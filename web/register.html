@@ -14,12 +14,27 @@
       <div class="login-box">
         <h1 class="texth1">Create an Account</h1>
         <form id="registerForm" onsubmit="return handleRegister(event)">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter your username" required />
+
           <label>Email</label>
           <input type="email" id="email" placeholder="Enter your email" required />
+
           <label>Password</label>
           <div><input type="password" id="password" placeholder="Enter your password" required /></div>
+
           <label>Confirm password</label>
           <input type="password" id="confirmPassword" placeholder="Confirm password" required />
+
+          <label>Role</label>
+          <select id="role" required
+            style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            <option value="">-- Select Role --</option>
+            <option value="doctor">Veterinarian (สัตวแพทย์)</option>
+            <option value="owner">Farm Owner (เจ้าของฟาร์ม)</option>
+            <option value="data">Staff (พนักงาน)</option>
+          </select>
+
           <button type="submit" class="login-btn">Register</button>
         </form>
         <div class="options">
@@ -29,18 +44,56 @@
       <script>
         function handleRegister(event) {
           event.preventDefault();
-          const email = document.getElementById('email').value;
+          const username = document.getElementById('username').value.trim();
+          const email = document.getElementById('email').value.trim();
           const password = document.getElementById('password').value;
           const confirmPassword = document.getElementById('confirmPassword').value;
+          const role = document.getElementById('role').value;
+
+          // Validation
+          if (!username || !email || !password || !confirmPassword || !role) {
+            alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+            return false;
+          }
 
           if (password !== confirmPassword) {
             alert('รหัสผ่านไม่ตรงกัน กรุณากรอกใหม่');
             return false;
           }
 
-          if (email && password && confirmPassword) {
-            window.location.href = 'login.html';
+          if (password.length < 6) {
+            alert('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
+            return false;
           }
+
+          // Create username with role suffix
+          const usernameWithRole = username + '@' + role;
+
+          // Get existing users from localStorage or create empty array
+          let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+          // Check if username already exists
+          const existingUser = users.find(u => u.username === usernameWithRole || u.email === email);
+          if (existingUser) {
+            alert('ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้แล้ว');
+            return false;
+          }
+
+          // Add new user
+          const newUser = {
+            username: usernameWithRole,
+            email: email,
+            password: password,
+            role: role,
+            createdAt: new Date().toISOString()
+          };
+          users.push(newUser);
+
+          // Save to localStorage
+          localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+          alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');
+          window.location.href = 'login.html';
           return false;
         }
       </script>

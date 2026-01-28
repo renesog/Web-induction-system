@@ -2,6 +2,7 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
       margin: 0;
       height: 100vh;
@@ -12,17 +13,17 @@
     }
 
     .bg-login {
-        background-image: url("image/1.png");
-        background-position: center;
-        background-repeat: repeat;
-        
+      background-image: url("image/1.png");
+      background-position: center;
+      background-repeat: repeat;
+
     }
 
     .left {
       width: 50%;
       padding: 60px;
       position: relative;
-      
+
     }
 
     .login-box {
@@ -30,7 +31,7 @@
       background: #caffc4;
       border-radius: 30px;
       padding: 40px 45px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     }
 
     .login-box h1 {
@@ -65,12 +66,14 @@
       cursor: pointer;
     }
 
-    .login-btn:hover{
+    .login-btn:hover {
       text-decoration: underline;
     }
+
     .texth1 {
-        text-align: center;
+      text-align: center;
     }
+
     .login-btn:hover {
       background: #08481d;
     }
@@ -80,7 +83,7 @@
       justify-content: space-between;
       font-size: 14px;
       margin-top: 15px;
-      
+
     }
 
     .options a {
@@ -93,16 +96,18 @@
         flex-direction: column;
         height: auto;
       }
+
       .login-box {
         margin: auto;
       }
     }
-  
-    .SignUp-line:hover{
+
+    .SignUp-line:hover {
       text-decoration: underline;
       color: #08481d;
     }
-.login-btn:hover {
-  transform: scale(1.1);
-  transition: 0.6s;
-}
+
+    .login-btn:hover {
+      transform: scale(1.1);
+      transition: 0.6s;
+    }

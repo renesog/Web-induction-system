@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="style5.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="auth.js"></script>
 </head>
 
 <body class="flex bg-[#f9fbf9]">
@@ -25,20 +26,20 @@
             <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
         </div>
 
-        <nav class="space-y-2 px-2">
-            <a href="index.html" class="nav-link active">
+        <nav class="space-y-2 px-2" id="mainNav">
+            <a href="index.html" class="nav-link active" id="nav-dashboard">
                 <i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก
             </a>
-            <a href="cattle_info.html" class="nav-link">
+            <a href="cattle_info.html" class="nav-link" id="nav-cattle">
                 <i class="fa-solid fa-cow w-6 text-center mr-2"></i> บันทึกข้อมูลโค
             </a>
-            <a href="feeding.html" class="nav-link">
+            <a href="feeding.html" class="nav-link" id="nav-feeding">
                 <i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i> ข้อมูลการให้อาหาร
             </a>
-            <a href="growth.html" class="nav-link">
+            <a href="growth.html" class="nav-link" id="nav-growth">
                 <i class="fa-solid fa-chart-line w-6 text-center mr-2"></i> ข้อมูลการเจริญเติบโต
             </a>
-            <a href="health.html" class="nav-link">
+            <a href="health.html" class="nav-link" id="nav-health">
                 <i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i> ข้อมูลสุขภาพและการดูแล
             </a>
         </nav>
@@ -71,7 +72,7 @@
                         <span class="font-medium">โปรไฟล์</span>
                     </a>
                     <div class="border-t border-gray-100 my-1"></div>
-                    <a href="login.html"
+                    <a href="#" onclick="logout(); return false;"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                         <i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i>
                         <span class="font-medium">ออกจากระบบ</span>
@@ -81,6 +82,22 @@
         </header>
 
         <div class="p-8">
+            <!-- Welcome Banner -->
+            <div id="welcomeBanner"
+                class="bg-gradient-to-r from-[#85C38C] to-[#A8D5BA] rounded-2xl p-6 mb-8 shadow-md hidden">
+                <div class="flex items-center gap-4">
+                    <div id="welcomeAvatarContainer"
+                        class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm overflow-hidden">
+                        <i id="welcomeDefaultIcon" class="fa-solid fa-hand-wave text-2xl text-[#85C38C]"></i>
+                        <img id="welcomeProfileImage" src="" alt="Profile" class="w-full h-full object-cover hidden">
+                    </div>
+                    <div>
+                        <h2 id="welcomeText" class="text-2xl font-bold text-white">ยินดีต้อนรับ</h2>
+                        <p class="text-white/80 text-sm">ขอให้มีวันที่ดี!</p>
+                    </div>
+                </div>
+            </div>
+
             <h1 class="text-3xl font-bold text-[#2D4A31] mb-8 border-l-8 border-[#85C38C] pl-4">
                 ภาพรวมระบบ (DASHBOARD)
             </h1>
@@ -150,6 +167,94 @@
                     <div id="area-chart"></div>
                 </div>
 
+            </div>
+
+            <!-- Role-Based Sections -->
+            <!-- Medical Section (Veterinarian - @doctor) -->
+            <div id="medicalSection" class="mt-8 hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 shadow-lg text-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-stethoscope text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">ส่วนงานสัตวแพทย์ (Medical Section)</h3>
+                            <p class="text-white/80 text-sm">สำหรับสัตวแพทย์เท่านั้น</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">การรักษาวันนี้</p>
+                            <p class="text-2xl font-bold">12</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">โคป่วย</p>
+                            <p class="text-2xl font-bold">5</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">นัดตรวจสุขภาพ</p>
+                            <p class="text-2xl font-bold">8</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Section (Farm Owner - @owner) -->
+            <div id="financialSection" class="mt-8 hidden">
+                <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 shadow-lg text-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-coins text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">ส่วนงานการเงิน (Financial Section)</h3>
+                            <p class="text-white/80 text-sm">สำหรับเจ้าของฟาร์มเท่านั้น</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">รายได้เดือนนี้</p>
+                            <p class="text-2xl font-bold">฿ 250,000</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">รายจ่ายเดือนนี้</p>
+                            <p class="text-2xl font-bold">฿ 80,000</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">กำไรสุทธิ</p>
+                            <p class="text-2xl font-bold">฿ 170,000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Entry Section (Staff - @data) -->
+            <div id="dataEntrySection" class="mt-8 hidden">
+                <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 shadow-lg text-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-database text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">ส่วนงานบันทึกข้อมูล (Data Entry Section)</h3>
+                            <p class="text-white/80 text-sm">สำหรับพนักงานเท่านั้น</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">รายการบันทึกวันนี้</p>
+                            <p class="text-2xl font-bold">45</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">รอตรวจสอบ</p>
+                            <p class="text-2xl font-bold">12</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <p class="text-sm text-white/70">อนุมัติแล้ว</p>
+                            <p class="text-2xl font-bold">33</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
