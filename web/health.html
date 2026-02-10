@@ -162,6 +162,8 @@
 
                     <div class="space-y-1"><label class="font-bold text-gray-700">ค่าใช้จ่าย (บาท) :</label><input
                             type="number" id="inputCost" class="w-full p-2 border rounded-lg" placeholder="0"></div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">สัตวแพทย์/ผู้ตรวจ :</label><input
+                            type="text" id="inputOfficer" class="w-full p-2 border rounded-lg"></div>
 
                 </div>
             </div>
@@ -325,6 +327,7 @@
                         <p><i class="fa-solid fa-stethoscope text-green-600 w-5"></i> <strong>อาการ :</strong> ${rec.symptoms || '-'}</p>
                         <p><i class="fa-solid fa-syringe text-green-600 w-5"></i> <strong>รักษา :</strong> ${rec.treatment || '-'}</p>
                         <p><i class="fa-solid fa-coins text-green-600 w-5"></i> <strong>ค่าใช้จ่าย :</strong> ${rec.cost || 0} บาท</p>
+                        <p class="text-xs text-gray-400 mt-2">ผู้ตรวจ: ${rec.veterinarian || '-'}</p>
                         ${(() => {
                     const vt = rec.veterinarian || '-';
                     const m = vt.match(/(.+?)\s*\[(.+?)\]/);
@@ -404,6 +407,7 @@
                         document.getElementById('inputSymptoms').value = rec.symptoms || '';
                         document.getElementById('inputTreatment').value = rec.treatment || '';
                         document.getElementById('inputCost').value = rec.cost || '';
+                        document.getElementById('inputOfficer').value = rec.veterinarian || '';
 
                         currentCowImage = rec.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
                         document.getElementById('healthPreview').src = currentCowImage;

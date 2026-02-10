@@ -369,17 +369,7 @@ app.get('/api/dashboard/stats', async (req, res) => {
 // Get all cattle
 app.get('/api/cattle', async (req, res) => {
     try {
-        const [cattle] = await pool.query(`
-            SELECT c.*, 
-                   m.name as mother_name, 
-                   f.name as father_name,
-                   u.username as owner_name
-            FROM cattle c
-            LEFT JOIN cattle m ON c.mother_id = m.id
-            LEFT JOIN cattle f ON c.father_id = f.id
-            LEFT JOIN users u ON c.owner_id = u.id
-            ORDER BY c.id DESC
-        `);
+        const [cattle] = await pool.query('SELECT * FROM cattle ORDER BY id DESC');
         res.json({ success: true, data: cattle });
     } catch (error) {
         console.error('Get cattle error:', error);
@@ -392,17 +382,10 @@ app.get('/api/cattle/:id', async (req, res) => {
     try {
         const { id } = req.params;
         // ค้นหาทั้งจาก id และ cattle_code
-        const [cattle] = await pool.query(`
-            SELECT c.*, 
-                   m.name as mother_name, 
-                   f.name as father_name,
-                   u.username as owner_name
-            FROM cattle c
-            LEFT JOIN cattle m ON c.mother_id = m.id
-            LEFT JOIN cattle f ON c.father_id = f.id
-            LEFT JOIN users u ON c.owner_id = u.id
-            WHERE c.id = ? OR c.cattle_code = ?
-        `, [id, id]);
+        const [cattle] = await pool.query(
+            'SELECT * FROM cattle WHERE id = ? OR cattle_code = ?',
+            [id, id]
+        );
 
         if (cattle.length === 0) {
             return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลโค' });
@@ -420,7 +403,7 @@ app.post('/api/cattle', async (req, res) => {
     try {
         const {
             cattle_code, name, breed, gender, birth_date, entry_date,
-            source, status, mother_id, father_id, notes, image_url, owner_id
+            source, status, notes, image_url
         } = req.body;
 
         // Validation
@@ -433,11 +416,10 @@ app.post('/api/cattle', async (req, res) => {
 
         const [result] = await pool.query(
             `INSERT INTO cattle (cattle_code, name, breed, gender, birth_date, entry_date, 
-             source, status, mother_id, father_id, notes, image_url, owner_id) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             source, status, notes, image_url) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [cattle_code, name, breed, gender, birth_date, entry_date,
-                source, status || 'active', mother_id || null, father_id || null,
-                notes, image_url, owner_id || null]
+                source, status || 'active', notes, image_url]
         );
 
         // Log buy transaction
@@ -468,18 +450,16 @@ app.put('/api/cattle/:id', async (req, res) => {
         const { id } = req.params;
         const {
             cattle_code, name, breed, gender, birth_date, entry_date,
-            source, status, mother_id, father_id, notes, image_url, owner_id
+            source, status, notes, image_url
         } = req.body;
 
         const [result] = await pool.query(
             `UPDATE cattle SET 
              cattle_code = ?, name = ?, breed = ?, gender = ?, birth_date = ?, 
-             entry_date = ?, source = ?, status = ?, mother_id = ?, father_id = ?, 
-             notes = ?, image_url = ?, owner_id = ?
+             entry_date = ?, source = ?, status = ?, notes = ?, image_url = ?
              WHERE id = ?`,
             [cattle_code, name, breed, gender, birth_date, entry_date,
-                source, status, mother_id || null, father_id || null,
-                notes, image_url, owner_id || null, id]
+                source, status, notes, image_url, id]
         );
 
         if (result.affectedRows === 0) {
@@ -527,16 +507,10 @@ app.get('/api/cattle/search/:query', async (req, res) => {
         const { query } = req.params;
         const searchTerm = `%${query}%`;
 
-        const [cattle] = await pool.query(`
-            SELECT c.*, 
-                   m.name as mother_name, 
-                   f.name as father_name
-            FROM cattle c
-            LEFT JOIN cattle m ON c.mother_id = m.id
-            LEFT JOIN cattle f ON c.father_id = f.id
-            WHERE c.cattle_code LIKE ? OR c.name LIKE ? OR c.breed LIKE ?
-            ORDER BY c.id DESC
-        `, [searchTerm, searchTerm, searchTerm]);
+        const [cattle] = await pool.query(
+            'SELECT * FROM cattle WHERE cattle_code LIKE ? OR name LIKE ? OR breed LIKE ? ORDER BY id DESC',
+            [searchTerm, searchTerm, searchTerm]
+        );
 
         res.json({ success: true, data: cattle });
     } catch (error) {
@@ -591,7 +565,7 @@ app.get('/api/feeding/cattle/:cattleId', async (req, res) => {
 app.post('/api/feeding', async (req, res) => {
     try {
         const {
-            cattle_id, feed_date, feed_time,
+            cattle_id, feed_date,
             quantity, unit, cost, notes, recorded_by
         } = req.body;
 
@@ -615,9 +589,9 @@ app.post('/api/feeding', async (req, res) => {
         const actualCattleId = cattle[0].id;
 
         const [result] = await pool.query(
-            `INSERT INTO feeding_records (cattle_id, feed_date, feed_time, quantity, unit, cost, notes, recorded_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [actualCattleId, feed_date, feed_time || null, quantity, unit || 'kg', cost || null, notes || null, recorded_by || null]
+            `INSERT INTO feeding_records (cattle_id, feed_date, quantity, unit, cost, notes, recorded_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [actualCattleId, feed_date, quantity, unit || 'kg', cost || null, notes || null, recorded_by || null]
         );
 
         res.json({
@@ -636,7 +610,7 @@ app.put('/api/feeding/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const {
-            cattle_id, feed_date, feed_time,
+            cattle_id, feed_date,
             quantity, unit, cost, notes, recorded_by
         } = req.body;
 
@@ -654,10 +628,10 @@ app.put('/api/feeding/:id', async (req, res) => {
 
         const [result] = await pool.query(
             `UPDATE feeding_records SET 
-             cattle_id = ?, feed_date = ?, feed_time = ?,
+             cattle_id = ?, feed_date = ?,
              quantity = ?, unit = ?, cost = ?, notes = ?, recorded_by = ?
              WHERE id = ?`,
-            [actualCattleId, feed_date, feed_time || null, quantity, unit || 'kg', cost || null, notes || null, recorded_by || null, id]
+            [actualCattleId, feed_date, quantity, unit || 'kg', cost || null, notes || null, recorded_by || null, id]
         );
 
         if (result.affectedRows === 0) {
@@ -869,7 +843,7 @@ app.get('/api/health/cattle/:cattleId', async (req, res) => {
 app.post('/api/health', async (req, res) => {
     try {
         const {
-            cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian, notes
+            cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian
         } = req.body;
 
         if (!cattle_id || !record_date) {
@@ -892,9 +866,9 @@ app.post('/api/health', async (req, res) => {
         const actualCattleId = cattle[0].id;
 
         const [result] = await pool.query(
-            `INSERT INTO health_records (cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian, notes) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [actualCattleId, record_date, health_status || 'normal', symptoms || null, treatment || null, cost || 0, veterinarian || null, notes || null]
+            `INSERT INTO health_records (cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [actualCattleId, record_date, health_status || 'normal', symptoms || null, treatment || null, cost || 0, veterinarian || null]
         );
 
         res.json({
@@ -913,14 +887,14 @@ app.put('/api/health/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const {
-            cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian, notes
+            cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian
         } = req.body;
 
         const [result] = await pool.query(
             `UPDATE health_records SET 
-             cattle_id = ?, record_date = ?, health_status = ?, symptoms = ?, treatment = ?, cost = ?, veterinarian = ?, notes = ?
+             cattle_id = ?, record_date = ?, health_status = ?, symptoms = ?, treatment = ?, cost = ?, veterinarian = ?
              WHERE id = ?`,
-            [cattle_id, record_date, health_status || 'normal', symptoms || null, treatment || null, cost || 0, veterinarian || null, notes || null, id]
+            [cattle_id, record_date, health_status || 'normal', symptoms || null, treatment || null, cost || 0, veterinarian || null, id]
         );
 
         if (result.affectedRows === 0) {

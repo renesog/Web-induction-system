@@ -79,8 +79,30 @@ function showRoleBasedNavigation(role) {
   if (navHealth) navHealth.style.display = permissions.health ? 'flex' : 'none';
 }
 
+// Show/Hide role-based sections
+function showRoleBasedSections(role) {
+  const medicalSection = document.getElementById('medicalSection');
+  const financialSection = document.getElementById('financialSection');
+  const dataEntrySection = document.getElementById('dataEntrySection');
 
+  // Hide all sections first
+  if (medicalSection) medicalSection.classList.add('hidden');
+  if (financialSection) financialSection.classList.add('hidden');
+  if (dataEntrySection) dataEntrySection.classList.add('hidden');
 
+  // Show section based on role
+  switch (role) {
+    case 'doctor':
+      if (medicalSection) medicalSection.classList.remove('hidden');
+      break;
+    case 'owner':
+      if (financialSection) financialSection.classList.remove('hidden');
+      break;
+    case 'staff':
+      if (dataEntrySection) dataEntrySection.classList.remove('hidden');
+      break;
+  }
+}
 
 // Welcome Message Function (using sessionStorage for logged-in user)
 function loadWelcomeMessage() {
@@ -109,7 +131,8 @@ function loadWelcomeMessage() {
     }
   }
 
-  // Show role-based navigation
+  // Show role-based sections and navigation
+  showRoleBasedSections(currentUser.role);
   showRoleBasedNavigation(currentUser.role);
 }
 
