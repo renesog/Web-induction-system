@@ -231,6 +231,15 @@
         let editId = null;
         let base64Image = "";
 
+<<<<<<< HEAD
+=======
+        // แปลง role เป็นภาษาไทย
+        function getRoleThai(role) {
+            const roles = { 'admin': 'ผู้ดูแลระบบ', 'doctor': 'สัตวแพทย์', 'owner': 'เจ้าของฟาร์ม', 'staff': 'เจ้าหน้าที่', 'data': 'เจ้าหน้าที่บันทึกข้อมูล' };
+            return roles[role] || role || '-';
+        }
+
+>>>>>>> main
         // Initial Load - ดึงข้อมูลจาก API
         window.onload = () => loadCattleFromAPI();
 
@@ -281,6 +290,14 @@
 
             if (!cattleCode || !name) return alert("กรุณากรอก ID และชื่อโค");
 
+<<<<<<< HEAD
+=======
+            // ดึงชื่อผู้ใช้จาก session
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            const recorderName = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim() || currentUser.username || '';
+            const roleThai = getRoleThai(currentUser.role);
+
+>>>>>>> main
             const cowData = {
                 cattle_code: cattleCode,
                 name: name,
@@ -290,8 +307,14 @@
                 entry_date: entryDate || new Date().toISOString().split('T')[0],
                 source: pen,
                 status: status,
+<<<<<<< HEAD
                 notes: `ราคาซื้อ: ${price} บาท`,
                 image_url: base64Image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png"
+=======
+                notes: `ราคาซื้อ: ${price} บาท | ${recorderName} [${roleThai}]`,
+                image_url: base64Image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png",
+                owner_id: currentUser.id || null
+>>>>>>> main
             };
 
             try {
@@ -357,6 +380,21 @@
             const imageUrl = cow.image_url || 'https://cdn-icons-png.flaticon.com/512/1998/1998610.png';
             const entryDate = cow.entry_date ? new Date(cow.entry_date).toLocaleDateString('th-TH') : '-';
 
+<<<<<<< HEAD
+=======
+            // แยกข้อมูลผู้กรอกจาก notes
+            const notesRaw = cow.notes || '';
+            const notesParts = notesRaw.split(' | ');
+            let recorderName = '-';
+            let recorderRole = '';
+            if (notesParts.length > 1) {
+                const recInfo = notesParts[1];
+                const roleMatch = recInfo.match(/(.+?)\s*\[(.+?)\]/);
+                if (roleMatch) { recorderName = roleMatch[1].trim(); recorderRole = roleMatch[2]; }
+                else { recorderName = recInfo.trim(); }
+            }
+
+>>>>>>> main
             const html = `
                 <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col group">
                     <div class="h-48 overflow-hidden bg-gray-100 relative">
@@ -371,6 +409,13 @@
                         <p><strong>อายุ :</strong> ${ageText}</p>
                         <p><strong>วันนำเข้า :</strong> ${entryDate}</p>
                         <p><strong>คอก :</strong> ${cow.source || '-'}</p>
+<<<<<<< HEAD
+=======
+                        <div class="bg-indigo-50 rounded-lg px-3 py-2 mt-2 border border-indigo-100">
+                            <p class="text-xs text-indigo-700"><i class="fa-solid fa-user-pen mr-1"></i> ผู้กรอก: <strong>${recorderName}</strong></p>
+                            ${recorderRole ? `<p class="text-xs text-indigo-500 mt-0.5"><i class="fa-solid fa-id-badge mr-1"></i> ตำแหน่ง: ${recorderRole}</p>` : ''}
+                        </div>
+>>>>>>> main
                         <div class="flex justify-end gap-2 mt-4 pt-2">
                             <button onclick="editCow(${cow.id})" class="w-8 h-8 bg-white rounded-full border border-gray-200 text-gray-600 hover:text-green-600 shadow-sm transition"><i class="fa-solid fa-pen text-xs"></i></button>
                             <button onclick="deleteCow(${cow.id})" class="w-8 h-8 bg-white rounded-full border border-red-100 text-red-400 hover:text-red-600 shadow-sm transition"><i class="fa-solid fa-trash text-xs"></i></button>

@@ -79,6 +79,7 @@ function showRoleBasedNavigation(role) {
   if (navHealth) navHealth.style.display = permissions.health ? 'flex' : 'none';
 }
 
+<<<<<<< HEAD
 // Show/Hide role-based sections
 function showRoleBasedSections(role) {
   const medicalSection = document.getElementById('medicalSection');
@@ -103,6 +104,10 @@ function showRoleBasedSections(role) {
       break;
   }
 }
+=======
+
+
+>>>>>>> main
 
 // Welcome Message Function (using sessionStorage for logged-in user)
 function loadWelcomeMessage() {
@@ -131,8 +136,12 @@ function loadWelcomeMessage() {
     }
   }
 
+<<<<<<< HEAD
   // Show role-based sections and navigation
   showRoleBasedSections(currentUser.role);
+=======
+  // Show role-based navigation
+>>>>>>> main
   showRoleBasedNavigation(currentUser.role);
 }
 
