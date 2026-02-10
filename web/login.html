@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="login.css">
+</head>
+
+<body class="bg-login">
+
+  <div class="container">
+    <div class="left">
+      <div class="login-box">
+        <h1 class="texth1">Sign In</h1>
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter your username (e.g. somchai@doctor)" required />
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required />
+          <button type="submit" class="login-btn">Log In</button>
+        </form>
+        <div class="options">
+          <p>Don't have an account ? <a href="register.html" class="SignUp-line" id="SignUp">Sign Up</a></p>
+        </div>
+      </div>
+      <script>
+        async function handleLogin(event) {
+          event.preventDefault();
+          const username = document.getElementById('username').value.trim();
+          const password = document.getElementById('password').value;
+
+          if (!username || !password) {
+            alert('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน');
+            return false;
+          }
+
+          try {
+            const response = await fetch('/api/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              // Save current user to sessionStorage
+              const currentUser = {
+                ...data.user,
+                loginTime: new Date().toISOString()
+              };
+              sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+              // Redirect to dashboard
+              window.location.href = 'index.html';
+            } else {
+              alert(data.message || 'ชื่อผู้kaiใช้หรือรหัสผ่านไม่ถูกต้อง');
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
+          }
+          return false;
+        }
+      </script>
+    </div>
+    <div class="right"></div>
+  </div>
+  <script src="login.js"></script>
+</body>
+
+</html>

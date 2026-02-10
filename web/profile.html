@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Induction System</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="style5.css">
+    <script src="auth.js"></script>
+</head>
+
+<body class="flex bg-[#f9fbf9]">
+
+    <aside class="sidebar">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
+            <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
+            <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
+        </a>
+
+        <nav class="space-y-2 px-2">
+            <a href="index.html" class="nav-link">
+                <i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก
+            </a>
+            <a href="cattle_info.html" class="nav-link">
+                <i class="fa-solid fa-cow w-6 text-center mr-2"></i> บันทึกข้อมูลโค
+            </a>
+            <a href="feeding.html" class="nav-link">
+                <i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i> ข้อมูลการให้อาหาร
+            </a>
+            <a href="growth.html" class="nav-link">
+                <i class="fa-solid fa-chart-line w-6 text-center mr-2"></i> ข้อมูลการเจริญเติบโต
+            </a>
+            <a href="health.html" class="nav-link">
+                <i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i> ข้อมูลสุขภาพและการดูแล
+            </a>
+            <a href="admin.html" class="nav-link" id="nav-admin">
+                <i class="fa-solid fa-user-shield w-6 text-center mr-2"></i> จัดการผู้ใช้
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <main class="main-content">
+
+        <header class="header shadow-sm relative z-50" style="background-color: #85C38C;">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="relative">
+                <button id="profileBtn"
+                    class="w-[45px] h-[45px] bg-white rounded-full flex items-center justify-center text-lg cursor-pointer hover:scale-110 transition shadow-md focus:outline-none">
+                    <i class="fa-regular fa-user text-gray-600"></i>
+                </button>
+
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 transform origin-top-right transition-all z-50 overflow-hidden">
+                    <a href="login.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i>
+                        <span class="font-medium">ออกจากระบบ</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-5xl mx-auto">
+
+            <div class="bg-white rounded-[20px] p-6 mb-6 shadow-sm border border-gray-100 flex items-center gap-6">
+                <!-- Profile Picture Upload -->
+                <div class="relative group cursor-pointer"
+                    onclick="document.getElementById('profileImageInput').click()">
+                    <div id="profileAvatarContainer"
+                        class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-4 border-[#85C38C] shadow-md">
+                        <span id="defaultAvatar"
+                            class="material-symbols-outlined text-5xl text-gray-400">account_circle</span>
+                        <img id="profileImage" src="" alt="Profile" class="w-full h-full object-cover hidden">
+                    </div>
+                    <!-- Upload Overlay -->
+                    <div
+                        class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="fa-solid fa-camera text-white text-xl"></i>
+                    </div>
+                    <input type="file" id="profileImageInput" accept="image/*" class="hidden"
+                        onchange="handleImageUpload(event)">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span id="displayName" class="text-xl text-gray-800 font-semibold">-</span>
+                    <span id="displayEmail" class="text-sm text-gray-500"><i
+                            class="fa-regular fa-envelope mr-2"></i>-</span>
+                    <span id="displayPhone" class="text-sm text-gray-500"><i class="fa-solid fa-phone mr-2"></i>-</span>
+                    <span id="displayFarm" class="text-sm text-gray-500"><i
+                            class="fa-solid fa-house-chimney mr-2"></i>-</span>
+                </div>
+            </div>
+
+            <!-- View Mode Container -->
+            <div id="viewModeContainer" class="bg-[#A8D5BA] rounded-[25px] p-10 relative shadow-md hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white rounded-xl px-5 py-4 shadow-sm">
+                        <p class="text-sm text-gray-500 mb-1">ชื่อ</p>
+                        <p id="viewFirstName" class="text-lg font-semibold text-[#2D4A31]">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl px-5 py-4 shadow-sm">
+                        <p class="text-sm text-gray-500 mb-1">นามสกุล</p>
+                        <p id="viewLastName" class="text-lg font-semibold text-[#2D4A31]">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl px-5 py-4 shadow-sm">
+                        <p class="text-sm text-gray-500 mb-1">Email</p>
+                        <p id="viewEmail" class="text-lg font-semibold text-[#2D4A31]">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl px-5 py-4 shadow-sm">
+                        <p class="text-sm text-gray-500 mb-1">เบอร์โทรศัพท์</p>
+                        <p id="viewPhone" class="text-lg font-semibold text-[#2D4A31]">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl px-5 py-4 shadow-sm md:col-span-2">
+                        <p class="text-sm text-gray-500 mb-1">ชื่อฟาร์ม</p>
+                        <p id="viewFarmName" class="text-lg font-semibold text-[#2D4A31]">-</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-center mt-12">
+                    <button onclick="switchToEditMode()"
+                        class="bg-[#007bff] hover:bg-[#0056b3] text-white px-16 py-3 rounded-full font-bold text-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        แก้ไขข้อมูล
+                    </button>
+                </div>
+
+                <img src="image/grass.png" class="absolute bottom-0 left-5 w-32 opacity-90 pointer-events-none" alt="">
+                <img src="image/cow-sticker.png" class="absolute bottom-2 right-5 w-24 pointer-events-none" alt="">
+            </div>
+
+            <!-- Edit Mode Container -->
+            <div id="editModeContainer" class="bg-[#A8D5BA] rounded-[25px] p-10 relative shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="space-y-1">
+                        <label class="font-bold text-[#2D4A31]">ชื่อ :</label>
+                        <div class="bg-white rounded-xl flex items-center px-4 py-2 shadow-inner">
+                            <input type="text" id="firstName" class="w-full bg-transparent outline-none text-gray-700">
+                            <span class="material-symbols-outlined text-gray-400 cursor-pointer">edit_square</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-[#2D4A31]">นามสกุล :</label>
+                        <div class="bg-white rounded-xl flex items-center px-4 py-2 shadow-inner">
+                            <input type="text" id="lastName" class="w-full bg-transparent outline-none text-gray-700">
+                            <span class="material-symbols-outlined text-gray-400 cursor-pointer">edit_square</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-[#2D4A31]">Email :</label>
+                        <div class="bg-white rounded-xl flex items-center px-4 py-2 shadow-inner">
+                            <input type="email" id="email" class="w-full bg-transparent outline-none text-gray-700">
+                            <span class="material-symbols-outlined text-gray-400 cursor-pointer">edit_square</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-[#2D4A31]">เบอร์โทรศัพท์ :</label>
+                        <div class="bg-white rounded-xl flex items-center px-4 py-2 shadow-inner">
+                            <input type="tel" id="phone" class="w-full bg-transparent outline-none text-gray-700">
+                            <span class="material-symbols-outlined text-gray-400 cursor-pointer">edit_square</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-[#2D4A31]">ชื่อฟาร์ม :</label>
+                        <div class="bg-white rounded-xl flex items-center px-4 py-2 shadow-inner">
+                            <input type="text" id="farmName" placeholder="ระบุชื่อฟาร์ม"
+                                class="w-full bg-transparent outline-none text-gray-700">
+                            <span class="material-symbols-outlined text-gray-400 cursor-pointer">edit_square</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center mt-12">
+                    <button onclick="saveProfile()"
+                        class="bg-[#28a745] hover:bg-[#218838] text-white px-16 py-3 rounded-full font-bold text-lg shadow-lg transition transform hover:scale-105">
+                        บันทึกข้อมูล
+                    </button>
+                </div>
+
+                <img src="image/grass.png" class="absolute bottom-0 left-5 w-32 opacity-90 pointer-events-none" alt="">
+                <img src="image/cow-sticker.png" class="absolute bottom-2 right-5 w-24 pointer-events-none" alt="">
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        let currentUser = null;
+
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Sidebar Toggle Functions
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.remove('sidebar-open');
+                }
+            });
+        });
+
+        // Check if user is owner
+        function isOwner() {
+            return currentUser && currentUser.role === 'owner';
+        }
+
+        // Apply role-based UI
+        function applyRoleBasedUI() {
+            const farmNameField = document.getElementById('farmName');
+            const farmNameContainer = farmNameField ? farmNameField.closest('.space-y-1') : null;
+
+            if (!isOwner()) {
+                // Only disable farm name field for non-owners
+                if (farmNameField) {
+                    farmNameField.readOnly = true;
+                    farmNameField.style.backgroundColor = '#f0f0f0';
+                    farmNameField.placeholder = 'เฉพาะเจ้าของฟาร์มเท่านั้นที่แก้ไขได้';
+                }
+            }
+        }
+
+        // Profile Image Upload Functions (all roles can upload)
+        function handleImageUpload(event) {
+
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('ขนาดไฟล์ต้องไม่เกิน 2MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imageData = e.target.result;
+                    displayProfileImage(imageData);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayProfileImage(imageData) {
+            const profileImage = document.getElementById('profileImage');
+            const defaultAvatar = document.getElementById('defaultAvatar');
+
+            if (imageData) {
+                profileImage.src = imageData;
+                profileImage.classList.remove('hidden');
+                defaultAvatar.classList.add('hidden');
+            } else {
+                profileImage.classList.add('hidden');
+                defaultAvatar.classList.remove('hidden');
+            }
+        }
+
+        // Mode switching functions
+        function switchToViewMode() {
+            document.getElementById('viewModeContainer').classList.remove('hidden');
+            document.getElementById('editModeContainer').classList.add('hidden');
+        }
+
+        function switchToEditMode() {
+            document.getElementById('viewModeContainer').classList.add('hidden');
+            document.getElementById('editModeContainer').classList.remove('hidden');
+            // Apply role-based restrictions after switching
+            applyRoleBasedUI();
+        }
+
+        // Save Profile via API (all roles can save)
+        async function saveProfile() {
+
+            const profileData = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                profile_image: document.getElementById('profileImage').src || null,
+                requester_role: currentUser.role
+            };
+
+            try {
+                // Save user profile
+                const response = await fetch(`/api/profile/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+
+                const data = await response.json();
+
+                // If owner, also save farm settings
+                if (isOwner()) {
+                    const farmData = {
+                        farm_name: document.getElementById('farmName').value,
+                        requester_role: currentUser.role
+                    };
+                    await fetch('/api/farm-settings', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(farmData)
+                    });
+                }
+
+                if (data.success) {
+                    alert('บันทึกข้อมูลสำเร็จ!');
+                    await loadProfile();
+                    switchToViewMode();
+                } else {
+                    alert(data.message || 'เกิดข้อผิดพลาดในการบันทึก');
+                }
+            } catch (error) {
+                console.error('Save profile error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
+        }
+
+        function updateHeaderDisplay(profileData, farmName) {
+            const displayName = document.getElementById('displayName');
+            const displayEmail = document.getElementById('displayEmail');
+            const displayPhone = document.getElementById('displayPhone');
+            const displayFarm = document.getElementById('displayFarm');
+
+            if (displayName) {
+                const fullName = (profileData.first_name || '') + ' ' + (profileData.last_name || '');
+                displayName.textContent = fullName.trim() || currentUser.username || '-';
+            }
+            if (displayEmail) {
+                displayEmail.innerHTML = '<i class="fa-regular fa-envelope mr-2"></i>' + (profileData.email || '-');
+            }
+            if (displayPhone) {
+                displayPhone.innerHTML = '<i class="fa-solid fa-phone mr-2"></i>' + (profileData.phone || '-');
+            }
+            if (displayFarm) {
+                displayFarm.innerHTML = '<i class="fa-solid fa-house-chimney mr-2"></i>' + (farmName || '-');
+            }
+        }
+
+        function updateViewMode(profileData, farmName) {
+            document.getElementById('viewFirstName').textContent = profileData.first_name || '-';
+            document.getElementById('viewLastName').textContent = profileData.last_name || '-';
+            document.getElementById('viewEmail').textContent = profileData.email || '-';
+            document.getElementById('viewPhone').textContent = profileData.phone || '-';
+            document.getElementById('viewFarmName').textContent = farmName || '-';
+        }
+
+        function updateEditMode(profileData, farmName) {
+            document.getElementById('firstName').value = profileData.first_name || '';
+            document.getElementById('lastName').value = profileData.last_name || '';
+            document.getElementById('email').value = profileData.email || '';
+            document.getElementById('phone').value = profileData.phone || '';
+            document.getElementById('farmName').value = farmName || '';
+        }
+
+        // Load Profile from API
+        async function loadProfile() {
+            if (!currentUser) return;
+
+            try {
+                // Load user profile
+                const profileResponse = await fetch(`/api/profile/${currentUser.id}`);
+                const profileResult = await profileResponse.json();
+
+                // Load farm settings (shared)
+                const farmResponse = await fetch('/api/farm-settings');
+                const farmResult = await farmResponse.json();
+
+                if (profileResult.success) {
+                    const profileData = profileResult.data;
+                    const farmName = farmResult.success ? farmResult.data.farm_name : '';
+
+                    // Update displays
+                    updateHeaderDisplay(profileData, farmName);
+                    updateViewMode(profileData, farmName);
+                    updateEditMode(profileData, farmName);
+
+                    // Display profile image
+                    if (profileData.profile_image) {
+                        displayProfileImage(profileData.profile_image);
+                    }
+
+                    // Check if has data
+                    const hasData = profileData.first_name || profileData.last_name || profileData.phone || farmName;
+
+                    if (hasData) {
+                        switchToViewMode();
+                    } else {
+                        document.getElementById('viewModeContainer').classList.add('hidden');
+                        document.getElementById('editModeContainer').classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Load profile error:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Get current user from session
+            const userSession = sessionStorage.getItem('currentUser');
+            if (userSession) {
+                currentUser = JSON.parse(userSession);
+            }
+
+            if (currentUser) {
+                await loadProfile();
+                applyRoleBasedUI();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create an Account</title>
+  <link rel="stylesheet" href="register.css">
+</head>
+
+<body class="bg-reg">
+  <div class="container">
+    <div class="left">
+      <div class="login-box">
+        <h1 class="texth1">Create an Account</h1>
+        <form id="registerForm" onsubmit="return handleRegister(event)">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter your username" required />
+
+          <label>Email</label>
+          <input type="email" id="email" placeholder="Enter your email" required />
+
+          <label>Password</label>
+          <div><input type="password" id="password" placeholder="Enter your password" required /></div>
+
+          <label>Confirm password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm password" required />
+
+          <label>Role</label>
+          <select id="role" required
+            style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            <option value="">-- Select Role --</option>
+            <option value="doctor">Veterinarian (สัตวแพทย์)</option>
+            <option value="owner">Farm Owner (เจ้าของฟาร์ม)</option>
+            <option value="staff">Staff (พนักงาน)</option>
+          </select>
+
+          <button type="submit" class="login-btn">Register</button>
+        </form>
+        <div class="options">
+          <p>Already have an account ? <a href="login.html" class="SignIn-line" id="SignIn">Sign In</a></p>
+        </div>
+      </div>
+      <script>
+        async function handleRegister(event) {
+          event.preventDefault();
+          const username = document.getElementById('username').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          const role = document.getElementById('role').value;
+
+          // Validation
+          if (!username || !email || !password || !confirmPassword || !role) {
+            alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+            return false;
+          }
+
+          if (password !== confirmPassword) {
+            alert('รหัสผ่านไม่ตรงกัน กรุณากรอกใหม่');
+            return false;
+          }
+
+          if (password.length < 6) {
+            alert('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
+            return false;
+          }
+
+          try {
+            const response = await fetch('/api/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ username, email, password, role })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');
+              window.location.href = 'login.html';
+            } else {
+              alert(data.message || 'เกิดข้อผิดพลาดในการลงทะเบียน');
+            }
+          } catch (error) {
+            console.error('Register error:', error);
+            alert('เกิดข้อผิดพลาดในการลงทะเบียน');
+          }
+          return false;
+        }
+      </script>
+    </div>
+    <div class="right"></div>
+  </div>
+  <script src="register.js"></script>
+</body>
+
+</html>

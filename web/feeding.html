@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลการให้อาหาร - Induction System</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="style5.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="auth.js"></script>
+</head>
+
+<body class="flex bg-[#f9fbf9]">
+
+    <aside class="sidebar">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
+            <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
+            <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
+        </a>
+        <nav class="space-y-2 px-2">
+            <a href="index.html" class="nav-link"><i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก</a>
+            <a href="cattle_info.html" class="nav-link"><i class="fa-solid fa-cow w-6 text-center mr-2"></i>
+                บันทึกข้อมูลโค</a>
+            <a href="feeding.html" class="nav-link active"><i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i>
+                ข้อมูลการให้อาหาร</a>
+            <a href="growth.html" class="nav-link"><i class="fa-solid fa-chart-line w-6 text-center mr-2"></i>
+                ข้อมูลการเจริญเติบโต</a>
+            <a href="health.html" class="nav-link"><i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i>
+                ข้อมูลสุขภาพและการดูแล</a>
+            <a href="admin.html" class="nav-link" id="nav-admin"><i
+                    class="fa-solid fa-user-shield w-6 text-center mr-2"></i>
+                จัดการผู้ใช้</a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <main class="main-content">
+        <header class="header shadow-sm relative z-50">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="relative">
+                <button id="profileBtn"
+                    class="user-icon shadow-md cursor-pointer hover:bg-gray-50 transition focus:outline-none">
+                    <i class="fa-regular fa-user text-gray-600"></i>
+                </button>
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl py-2 border border-gray-100 transform origin-top-right transition-all">
+                    <a href="profile.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition">
+                        <i class="fa-regular fa-circle-user mr-3 text-lg"></i>
+                        <span class="font-medium">โปรไฟล์</span>
+                    </a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="login.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i>
+                        <span class="font-medium">ออกจากระบบ</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <div class="max-w-7xl mx-auto mb-8">
+                <h1 class="text-3xl font-bold text-[#2D4A31] mb-6 border-l-8 border-[#85C38C] pl-4">ข้อมูลการให้อาหาร
+                </h1>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <div class="relative mb-4">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="searchInput" placeholder="ค้นหาด้วย ID หรือ ชื่อโค..."
+                            class="w-full p-2 border rounded-lg pl-10 shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none">
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <select id="feedTypeFilter"
+                            class="p-2 border rounded-lg bg-white min-w-[180px] shadow-sm cursor-pointer focus:ring-2 focus:ring-green-400">
+                            <option value="all">ประเภทอาหาร (ทั้งหมด)</option>
+                            <option value="อาหารข้น">อาหารข้น</option>
+                            <option value="อาหารหยาบ">อาหารหยาบ</option>
+                            <option value="TMR">TMR</option>
+                            <option value="หญ้าสด">หญ้าสด</option>
+                        </select>
+                        <select id="penFilter"
+                            class="p-2 border rounded-lg bg-white min-w-[150px] shadow-sm cursor-pointer focus:ring-2 focus:ring-green-400">
+                            <option value="all">คอก (ทั้งหมด)</option>
+                            <option value="คอก 1">คอก 1</option>
+                            <option value="คอก 2">คอก 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="feedingGrid"></div>
+            </div>
+        </div>
+
+        <button onclick="toggleModal()"
+            class="fixed bottom-8 right-8 w-16 h-16 bg-[#4ade80] text-white text-4xl rounded-full shadow-lg hover:bg-[#22c55e] hover:scale-110 transition-all flex items-center justify-center z-40">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </main>
+
+    <div id="feedingModal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-[200] p-4">
+        <div class="bg-white rounded-[30px] w-full max-w-5xl p-10 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h2 class="text-2xl font-bold mb-8 text-center text-[#2D4A31]">บันทึกการให้อาหาร</h2>
+
+            <div class="flex flex-col md:flex-row gap-10">
+                <div class="w-full md:w-1/3">
+                    <div
+                        class="w-full aspect-square bg-gray-100 rounded-3xl flex items-center justify-center border-2 border-gray-200 relative overflow-hidden shadow-inner">
+                        <img id="cowPreview" src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png"
+                            class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-2 italic">* รูปภาพดึงจากฐานข้อมูลหลัก</p>
+                </div>
+
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="col-span-full bg-orange-50 p-4 rounded-xl border border-orange-100 mb-2">
+                        <label class="font-bold text-orange-800">ค้นหา ID โค :</label>
+                        <div class="flex gap-2 mt-1">
+                            <input type="text" id="inputID" placeholder="กรอก ID ที่นี่..."
+                                class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none">
+                            <button onclick="pullData()"
+                                class="bg-orange-500 text-white px-4 rounded-lg font-bold hover:bg-orange-600 transition shadow-sm"><i
+                                    class="fa-solid fa-download mr-1"></i> ดึงข้อมูล</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ชื่อ/ฉายา :</label><input type="text"
+                            id="inputName" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" readonly>
+                    </div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">สายพันธุ์ :</label><input type="text"
+                            id="inputBreed" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed"
+                            readonly></div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">คอก :</label><input type="text"
+                            id="inputPen" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" readonly>
+                    </div>
+
+                    <div class="border-t border-gray-200 col-span-full my-2"></div>
+
+                    <div class="space-y-1"><label class="font-bold text-green-700">วันที่ให้ :</label><input type="date"
+                            id="inputDate" class="w-full p-2 border rounded-lg cursor-pointer"></div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ประเภทอาหาร :</label>
+                        <select id="inputFeedType" class="w-full p-2 border rounded-lg bg-white">
+                            <option value="อาหารข้น">อาหารข้น</option>
+                            <option value="อาหารหยาบ">อาหารหยาบ</option>
+                            <option value="อาหารหยาบ/อาหารข้น">อาหารหยาบ/อาหารข้น</option>
+                            <option value="หญ้าสด">หญ้าสด</option>
+                            <option value="TMR">TMR</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ปริมาณ (กก.) :</label><input
+                            type="number" id="inputAmount" class="w-full p-2 border rounded-lg"></div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ต้นทุน (บาท) :</label><input
+                            type="number" id="inputCost" class="w-full p-2 border rounded-lg"></div>
+
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-center gap-4">
+                <button onclick="toggleModal()"
+                    class="px-8 py-2 bg-gray-400 text-white rounded-full hover:bg-gray-500 transition">ยกเลิก</button>
+                <button onclick="saveFeedingData()"
+                    class="px-12 py-2 bg-[#0b5c13] text-white rounded-full font-bold shadow-md hover:bg-[#08450e] transition transform hover:scale-105">บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Dropdown & Initial ---
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.classList.toggle('hidden'); });
+            document.addEventListener('click', (e) => { if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) { profileDropdown.classList.add('hidden'); } });
+        }
+
+        let editId = null;
+        let currentCowImage = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+
+        // แปลง role เป็นภาษาไทย
+        function getRoleThai(role) {
+            const roles = { 'admin': 'ผู้ดูแลระบบ', 'doctor': 'สัตวแพทย์', 'owner': 'เจ้าของฟาร์ม', 'staff': 'เจ้าหน้าที่', 'data': 'เจ้าหน้าที่บันทึกข้อมูล' };
+            return roles[role] || role || '-';
+        }
+        window.onload = () => filterFeedingData();
+
+        // --- 2. Pull Data Function ---
+        async function pullData() {
+            const tid = document.getElementById('inputID').value;
+            if (!tid) {
+                alert("กรุณากรอก ID โค");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cattle/${tid}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const cow = result.data;
+                    document.getElementById('inputName').value = cow.name || '';
+                    document.getElementById('inputBreed').value = cow.breed || '';
+                    document.getElementById('inputPen').value = cow.source || '-';
+
+                    currentCowImage = cow.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                    document.getElementById('cowPreview').src = currentCowImage;
+                } else {
+                    alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก");
+                    document.getElementById('inputName').value = "";
+                    document.getElementById('inputBreed').value = "";
+                    document.getElementById('inputPen').value = "";
+                    document.getElementById('cowPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                }
+            } catch (error) {
+                console.error('Error fetching cattle:', error);
+                alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
+            }
+        }
+
+        // --- 3. CRUD Logic ---
+        function toggleModal() {
+            document.getElementById('feedingModal').classList.toggle('hidden');
+            if (document.getElementById('feedingModal').classList.contains('hidden')) { editId = null; clearForm(); }
+        }
+
+        async function saveFeedingData() {
+            const id = document.getElementById('inputID').value;
+            const name = document.getElementById('inputName').value;
+
+            if (!id || !name) return alert("กรุณาระบุ ID และกดปุ่ม 'ดึงข้อมูล' ก่อนบันทึก");
+
+            const feedDate = document.getElementById('inputDate').value;
+            const quantity = document.getElementById('inputAmount').value;
+
+            if (!feedDate || !quantity) return alert("กรุณากรอกวันที่และปริมาณอาหาร");
+
+            // ดึงชื่อผู้ใช้จาก session
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            const officerName = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim() || currentUser.username || '';
+            const roleThai = getRoleThai(currentUser.role);
+
+            const data = {
+                cattle_id: id,
+                feed_date: feedDate,
+                quantity: parseFloat(quantity) || 0,
+                cost: parseFloat(document.getElementById('inputCost').value) || 0,
+                notes: document.getElementById('inputFeedType').value + ' | ' + officerName + ' [' + roleThai + ']',
+                unit: 'kg'
+            };
+
+            try {
+                let response;
+                if (editId) {
+                    response = await fetch(`/api/feeding/${editId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await fetch('/api/feeding', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    filterFeedingData();
+                    toggleModal();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาด');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
+        }
+
+        function renderCard(rec) {
+            const image = rec.image_url || rec.image || 'https://cdn-icons-png.flaticon.com/512/1998/1998610.png';
+            const name = rec.cattle_name || rec.name || '-';
+            const cattleCode = rec.cattle_code || rec.id || '-';
+            const breed = rec.breed || '-';
+            const notesRaw = rec.feed_type_name || rec.notes || '-';
+            // แยก feedType และข้อมูลผู้กรอก
+            const notesParts = notesRaw.split(' | ');
+            const feedType = notesParts[0] || '-';
+            let recorderInfo = notesParts[1] || '-';
+            let recorderName = '-';
+            let recorderRole = '';
+            if (recorderInfo !== '-') {
+                const roleMatch = recorderInfo.match(/(.+?)\s*\[(.+?)\]/);
+                if (roleMatch) { recorderName = roleMatch[1].trim(); recorderRole = roleMatch[2]; }
+                else { recorderName = recorderInfo.trim(); }
+            }
+            const date = rec.feed_date ? new Date(rec.feed_date).toLocaleDateString('th-TH') : '-';
+            const recordId = rec.id || rec.recordId;
+
+            const html = `
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col group">
+                    <div class="h-40 overflow-hidden bg-gray-100 relative">
+                        <img src="${image}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-3">
+                            <h3 class="text-white font-bold text-lg">${name}</h3>
+                            <p class="text-green-200 text-xs font-medium">#${cattleCode} | ${breed}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 flex-1 text-sm space-y-2 bg-orange-50/30">
+                        <div class="flex justify-between text-xs text-gray-500 mb-2">
+                            <span><i class="fa-solid fa-layer-group mr-1"></i> ${rec.unit || 'kg'}</span>
+                            <span><i class="fa-regular fa-calendar mr-1"></i> ${date}</span>
+                        </div>
+                        <p class="font-bold text-gray-800"><i class="fa-solid fa-bowl-rice text-orange-500 mr-2"></i> ${feedType}</p>
+                        <p><i class="fa-solid fa-weight-hanging text-gray-400 mr-2 w-4"></i> ${rec.quantity || 0} กก.</p>
+                        <p><i class="fa-solid fa-coins text-gray-400 mr-2 w-4"></i> ${rec.cost || 0} บาท</p>
+                        <div class="bg-indigo-50 rounded-lg px-3 py-2 mt-2 border border-indigo-100">
+                            <p class="text-xs text-indigo-700"><i class="fa-solid fa-user-pen mr-1"></i> ผู้กรอก: <strong>${recorderName}</strong></p>
+                            ${recorderRole ? `<p class="text-xs text-indigo-500 mt-0.5"><i class="fa-solid fa-id-badge mr-1"></i> ตำแหน่ง: ${recorderRole}</p>` : ''}
+                        </div>
+                        
+                        <div class="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
+                            <button onclick="editCard('${recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-blue-600 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteCard('${recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-red-600 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            document.getElementById('feedingGrid').insertAdjacentHTML('afterbegin', html);
+        }
+
+        async function filterFeedingData() {
+            const s = document.getElementById('searchInput').value.toLowerCase();
+            const fType = document.getElementById('feedTypeFilter').value;
+
+            document.getElementById('feedingGrid').innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">กำลังโหลด...</div>';
+
+            try {
+                const response = await fetch('/api/feeding');
+                const result = await response.json();
+
+                if (result.success) {
+                    const list = result.data || [];
+                    document.getElementById('feedingGrid').innerHTML = '';
+
+                    const filtered = list.filter(r => {
+                        const name = (r.cattle_name || '').toLowerCase();
+                        const code = (r.cattle_code || '').toLowerCase();
+                        const notes = (r.notes || '').toLowerCase();
+                        const matchSearch = name.includes(s) || code.includes(s);
+                        const matchType = fType === 'all' || notes.includes(fType.toLowerCase());
+                        return matchSearch && matchType;
+                    });
+
+                    if (filtered.length === 0) {
+                        document.getElementById('feedingGrid').innerHTML = `
+                            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                                <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
+                                <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
+                            </div>`;
+                    } else {
+                        filtered.forEach(r => renderCard(r));
+                    }
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                document.getElementById('feedingGrid').innerHTML = '<div class="col-span-full text-center py-10 text-red-400">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+            }
+        }
+
+        async function editCard(recordId) {
+            try {
+                const response = await fetch('/api/feeding');
+                const result = await response.json();
+                if (result.success) {
+                    const rec = result.data.find(r => r.id == recordId);
+                    if (rec) {
+                        editId = recordId;
+                        document.getElementById('inputID').value = rec.cattle_code || rec.cattle_id;
+                        document.getElementById('inputName').value = rec.cattle_name || '';
+                        document.getElementById('inputBreed').value = rec.breed || '';
+                        document.getElementById('inputDate').value = rec.feed_date ? rec.feed_date.split('T')[0] : '';
+                        document.getElementById('inputAmount').value = rec.quantity || '';
+                        document.getElementById('inputCost').value = rec.cost || '';
+
+                        // Parse notes to get feed type
+                        if (rec.notes) {
+                            const parts = rec.notes.split(' - ');
+                            const feedType = parts[0] || '';
+                            document.getElementById('inputFeedType').value = feedType;
+                        } else {
+                            document.getElementById('inputFeedType').value = '';
+                        }
+
+                        // Fetch cattle data for pen (source)
+                        try {
+                            const cattleRes = await fetch(`/api/cattle/${rec.cattle_code || rec.cattle_id}`);
+                            const cattleData = await cattleRes.json();
+                            if (cattleData.success && cattleData.data) {
+                                document.getElementById('inputPen').value = cattleData.data.source || '';
+                            }
+                        } catch (e) {
+                            document.getElementById('inputPen').value = '';
+                        }
+
+                        currentCowImage = rec.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                        document.getElementById('cowPreview').src = currentCowImage;
+                        toggleModal();
+                    }
+                }
+            } catch (error) {
+                console.error('Edit error:', error);
+            }
+        }
+
+        async function deleteCard(recordId) {
+            if (confirm("ต้องการลบรายการนี้หรือไม่?")) {
+                try {
+                    const response = await fetch(`/api/feeding/${recordId}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.success) {
+                        filterFeedingData();
+                    } else {
+                        alert(result.message || 'เกิดข้อผิดพลาด');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    alert('เกิดข้อผิดพลาดในการลบ');
+                }
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('#feedingModal input, #feedingModal select').forEach(i => i.value = '');
+            document.getElementById('cowPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterFeedingData);
+        document.getElementById('feedTypeFilter').addEventListener('change', filterFeedingData);
+        document.getElementById('penFilter').addEventListener('change', filterFeedingData);
+
+        // Sidebar Toggle Functions
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.remove('sidebar-open');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

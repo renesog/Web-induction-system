@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลสุขภาพและการดูแล - Induction System</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="style5.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="auth.js"></script>
+</head>
+
+<body class="flex bg-[#f9fbf9]">
+
+    <aside class="sidebar">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
+            <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
+            <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
+        </a>
+        <nav class="space-y-2 px-2">
+            <a href="index.html" class="nav-link"><i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก</a>
+            <a href="cattle_info.html" class="nav-link"><i class="fa-solid fa-cow w-6 text-center mr-2"></i>
+                บันทึกข้อมูลโค</a>
+            <a href="feeding.html" class="nav-link"><i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i>
+                ข้อมูลการให้อาหาร</a>
+            <a href="growth.html" class="nav-link"><i class="fa-solid fa-chart-line w-6 text-center mr-2"></i>
+                ข้อมูลการเจริญเติบโต</a>
+            <a href="health.html" class="nav-link active"><i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i>
+                ข้อมูลสุขภาพและการดูแล</a>
+            <a href="admin.html" class="nav-link" id="nav-admin"><i
+                    class="fa-solid fa-user-shield w-6 text-center mr-2"></i>
+                จัดการผู้ใช้</a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <main class="main-content">
+        <header class="header shadow-sm relative z-50">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="relative">
+                <button id="profileBtn"
+                    class="user-icon shadow-md cursor-pointer hover:bg-gray-50 transition focus:outline-none">
+                    <i class="fa-regular fa-user text-gray-600"></i>
+                </button>
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl py-2 border border-gray-100 transform origin-top-right transition-all">
+                    <a href="profile.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition">
+                        <i class="fa-regular fa-circle-user mr-3 text-lg"></i>
+                        <span class="font-medium">โปรไฟล์</span>
+                    </a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="login.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i>
+                        <span class="font-medium">ออกจากระบบ</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <div class="max-w-7xl mx-auto mb-8">
+                <h1 class="text-3xl font-bold text-[#2D4A31] mb-6 border-l-8 border-[#85C38C] pl-4">
+                    ข้อมูลสุขภาพและการดูแล</h1>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <div class="relative mb-4">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="searchInput" placeholder="ค้นหาด้วย ID หรือ ชื่อโค..."
+                            class="w-full p-2 border rounded-lg pl-10 shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none">
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <select id="statusFilter"
+                            class="p-2 border rounded-lg bg-white min-w-[180px] shadow-sm focus:ring-2 focus:ring-green-400 cursor-pointer">
+                            <option value="all">สถานะสุขภาพ (ทั้งหมด)</option>
+                            <option value="ปกติ">ปกติ (Normal)</option>
+                            <option value="ป่วย">ป่วย (Sick)</option>
+                            <option value="รักษาหายแล้ว">รักษาหายแล้ว (Recovered)</option>
+                            <option value="เฝ้าระวัง">เฝ้าระวัง (Watch)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="healthGrid"></div>
+            </div>
+        </div>
+
+        <button onclick="toggleModal()"
+            class="fixed bottom-8 right-8 w-16 h-16 bg-[#4ade80] text-white text-4xl rounded-full shadow-lg hover:bg-[#22c55e] hover:scale-110 transition-all flex items-center justify-center z-40">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </main>
+
+    <div id="healthModal"
+        class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-[200] p-4">
+        <div class="bg-white rounded-[30px] w-full max-w-5xl p-10 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h2 class="text-2xl font-bold mb-8 text-center text-[#2D4A31]">บันทึกข้อมูลสุขภาพ</h2>
+
+            <div class="flex flex-col md:flex-row gap-10">
+                <div class="w-full md:w-1/3">
+                    <div
+                        class="w-full aspect-square bg-gray-100 rounded-3xl flex items-center justify-center border-2 border-gray-200 relative overflow-hidden shadow-inner">
+                        <img id="healthPreview" src="https://cdn-icons-png.flaticon.com/512/1998/1998610.png"
+                            class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-2 italic">* รูปภาพดึงจากฐานข้อมูลหลัก</p>
+                </div>
+
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="col-span-full bg-blue-50 p-4 rounded-xl border border-blue-100 mb-2">
+                        <label class="font-bold text-blue-800">ค้นหา ID โค :</label>
+                        <div class="flex gap-2 mt-1">
+                            <input type="text" id="inputID" placeholder="กรอก ID ที่นี่..."
+                                class="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                            <button onclick="pullData()"
+                                class="bg-blue-600 text-white px-4 rounded-lg font-bold hover:bg-blue-700 transition shadow-sm"><i
+                                    class="fa-solid fa-download mr-1"></i> ดึงข้อมูล</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ชื่อ/ฉายา :</label><input type="text"
+                            id="inputName" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed" readonly>
+                    </div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">สายพันธุ์ :</label><input type="text"
+                            id="inputBreed" class="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed"
+                            readonly></div>
+
+                    <div class="border-t border-gray-200 col-span-full my-2"></div>
+
+                    <div class="space-y-1"><label class="font-bold text-green-700">วันที่ตรวจ/รักษา :</label><input
+                            type="date" id="inputDate" class="w-full p-2 border rounded-lg cursor-pointer"></div>
+                    <div class="space-y-1"><label class="font-bold text-gray-700">สถานะสุขภาพ :</label>
+                        <select id="inputStatus" class="w-full p-2 border rounded-lg bg-white">
+                            <option value="ปกติ">ปกติ (Normal)</option>
+                            <option value="ป่วย">ป่วย (Sick)</option>
+                            <option value="รักษาหายแล้ว">รักษาหายแล้ว (Recovered)</option>
+                            <option value="เฝ้าระวัง">เฝ้าระวัง (Watch)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">อาการ/โรคที่พบ
+                            :</label><input type="text" id="inputSymptoms" placeholder="เช่น ซึม, ไม่กินหญ้า, ขาเจ็บ"
+                            class="w-full p-2 border rounded-lg"></div>
+                    <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">การรักษา/ยาที่ให้
+                            :</label><input type="text" id="inputTreatment"
+                            placeholder="เช่น ฉีดยาแก้อักเสบ, ให้วิตามิน" class="w-full p-2 border rounded-lg"></div>
+
+                    <div class="space-y-1"><label class="font-bold text-gray-700">ค่าใช้จ่าย (บาท) :</label><input
+                            type="number" id="inputCost" class="w-full p-2 border rounded-lg" placeholder="0"></div>
+
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-center gap-4">
+                <button onclick="toggleModal()"
+                    class="px-8 py-2 bg-gray-400 text-white rounded-full hover:bg-gray-500 transition">ยกเลิก</button>
+                <button onclick="saveHealthData()"
+                    class="px-12 py-2 bg-[#0b5c13] text-white rounded-full font-bold shadow-md hover:bg-[#08450e] transition transform hover:scale-105">บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Dropdown & Initial ---
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.classList.toggle('hidden'); });
+            document.addEventListener('click', (e) => { if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) { profileDropdown.classList.add('hidden'); } });
+        }
+
+        let editId = null;
+        let currentCowImage = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+
+        // แปลง role เป็นภาษาไทย
+        function getRoleThai(role) {
+            const roles = { 'admin': 'ผู้ดูแลระบบ', 'doctor': 'สัตวแพทย์', 'owner': 'เจ้าของฟาร์ม', 'staff': 'เจ้าหน้าที่', 'data': 'เจ้าหน้าที่บันทึกข้อมูล' };
+            return roles[role] || role || '-';
+        }
+        window.onload = () => filterHealthData();
+
+        // --- 2. Pull Data Function (ใช้ API) ---
+        async function pullData() {
+            const tid = document.getElementById('inputID').value;
+            if (!tid) {
+                alert("กรุณากรอก ID โค");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cattle/${tid}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const cow = result.data;
+                    document.getElementById('inputName').value = cow.name || '';
+                    document.getElementById('inputBreed').value = cow.breed || '';
+                    currentCowImage = cow.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                    document.getElementById('healthPreview').src = currentCowImage;
+                } else {
+                    alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก");
+                    document.getElementById('inputName').value = "";
+                    document.getElementById('inputBreed').value = "";
+                    document.getElementById('healthPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                }
+            } catch (error) {
+                console.error('Error fetching cattle:', error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ API");
+            }
+        }
+
+        // --- 3. CRUD Logic ---
+        function toggleModal() {
+            document.getElementById('healthModal').classList.toggle('hidden');
+            if (document.getElementById('healthModal').classList.contains('hidden')) { editId = null; clearForm(); }
+        }
+
+        // Map Thai status to English for database
+        function mapStatusToDb(thaiStatus) {
+            const statusMap = {
+                'ปกติ': 'normal',
+                'ป่วย': 'sick',
+                'รักษาหายแล้ว': 'recovered',
+                'เฝ้าระวัง': 'watch'
+            };
+            return statusMap[thaiStatus] || 'normal';
+        }
+
+        // Map English status from database to Thai for display
+        function mapStatusFromDb(dbStatus) {
+            const statusMap = {
+                'normal': 'ปกติ',
+                'sick': 'ป่วย',
+                'recovered': 'รักษาหายแล้ว',
+                'watch': 'เฝ้าระวัง'
+            };
+            return statusMap[dbStatus] || 'ปกติ';
+        }
+
+        async function saveHealthData() {
+            const cattle_id = document.getElementById('inputID').value;
+            const record_date = document.getElementById('inputDate').value;
+            const health_status = mapStatusToDb(document.getElementById('inputStatus').value);
+            const symptoms = document.getElementById('inputSymptoms').value;
+            const treatment = document.getElementById('inputTreatment').value;
+            const cost = parseFloat(document.getElementById('inputCost').value) || 0;
+
+            // ดึงชื่อผู้ใช้จาก session
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            const vetName = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim() || currentUser.username || '';
+            const roleThai = getRoleThai(currentUser.role);
+            const veterinarian = vetName + ' [' + roleThai + ']';
+
+            if (!cattle_id || !record_date) {
+                return alert("กรุณาระบุ ID โค และวันที่ตรวจ/รักษา");
+            }
+
+            try {
+                const method = editId ? 'PUT' : 'POST';
+                const url = editId ? `/api/health/${editId}` : '/api/health';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    filterHealthData();
+                    toggleModal();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาด');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
+        }
+
+        function renderCard(rec) {
+            // กำหนดสีตามสถานะ
+            const thaiStatus = mapStatusFromDb(rec.health_status);
+            let statusColor = "bg-gray-100 text-gray-600";
+            if (thaiStatus === "ปกติ") statusColor = "bg-green-100 text-green-700";
+            if (thaiStatus === "ป่วย") statusColor = "bg-red-100 text-red-700";
+            if (thaiStatus === "เฝ้าระวัง") statusColor = "bg-orange-100 text-orange-700";
+            if (thaiStatus === "รักษาหายแล้ว") statusColor = "bg-blue-100 text-blue-700";
+
+            const imageUrl = rec.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+            const cattleName = rec.cattle_name || rec.name || '-';
+            const cattleId = rec.cattle_code || rec.cattle_id || rec.id;
+
+            const html = `
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col">
+                    <div class="h-40 overflow-hidden bg-gray-100 relative">
+                        <img src="${imageUrl}" class="w-full h-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
+                        <div class="absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-bold ${statusColor} shadow-sm">
+                            ${thaiStatus}
+                        </div>
+                    </div>
+                    <div class="p-4 flex-1 text-sm space-y-2">
+                        <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+                            <span class="font-bold text-lg text-gray-800">${cattleName}</span>
+                            <span class="text-xs text-gray-500">ID: ${cattleId}</span>
+                        </div>
+                        <p><i class="fa-regular fa-calendar text-green-600 w-5"></i> <strong>วันที่ :</strong> ${rec.record_date || '-'}</p>
+                        <p><i class="fa-solid fa-stethoscope text-green-600 w-5"></i> <strong>อาการ :</strong> ${rec.symptoms || '-'}</p>
+                        <p><i class="fa-solid fa-syringe text-green-600 w-5"></i> <strong>รักษา :</strong> ${rec.treatment || '-'}</p>
+                        <p><i class="fa-solid fa-coins text-green-600 w-5"></i> <strong>ค่าใช้จ่าย :</strong> ${rec.cost || 0} บาท</p>
+                        ${(() => {
+                    const vt = rec.veterinarian || '-';
+                    const m = vt.match(/(.+?)\s*\[(.+?)\]/);
+                    const vName = m ? m[1].trim() : vt;
+                    const vRole = m ? m[2] : '';
+                    return `<div class="bg-indigo-50 rounded-lg px-3 py-2 mt-2 border border-indigo-100">
+                                <p class="text-xs text-indigo-700"><i class="fa-solid fa-user-pen mr-1"></i> ผู้กรอก: <strong>${vName}</strong></p>
+                                ${vRole ? `<p class="text-xs text-indigo-500 mt-0.5"><i class="fa-solid fa-id-badge mr-1"></i> ตำแหน่ง: ${vRole}</p>` : ''}
+                            </div>`;
+                })()}
+                        
+                        <div class="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
+                            <button onclick="editCard(${rec.id})" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-blue-600 hover:border-blue-300 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteCard(${rec.id})" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-red-600 hover:border-red-300 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            document.getElementById('healthGrid').insertAdjacentHTML('afterbegin', html);
+        }
+
+        async function filterHealthData() {
+            const s = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            document.getElementById('healthGrid').innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">กำลังโหลด...</div>';
+
+            try {
+                const response = await fetch('/api/health');
+                const result = await response.json();
+
+                if (result.success) {
+                    let list = result.data || [];
+                    document.getElementById('healthGrid').innerHTML = '';
+
+                    const filtered = list.filter(r => {
+                        const cattleId = (r.cattle_code || r.cattle_id || '').toString().toLowerCase();
+                        const cattleName = (r.cattle_name || r.name || '').toLowerCase();
+                        const symptoms = (r.symptoms || '').toLowerCase();
+                        const thaiStatus = mapStatusFromDb(r.health_status);
+
+                        const matchSearch = cattleId.includes(s) || cattleName.includes(s) || symptoms.includes(s);
+                        const matchStatus = status === 'all' || thaiStatus === status;
+
+                        return matchSearch && matchStatus;
+                    });
+
+                    if (filtered.length === 0) {
+                        document.getElementById('healthGrid').innerHTML = `
+                            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                                <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
+                                <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
+                            </div>`;
+                    } else {
+                        filtered.forEach(r => renderCard(r));
+                    }
+                } else {
+                    document.getElementById('healthGrid').innerHTML = '<div class="col-span-full text-center py-10 text-red-500">เกิดข้อผิดพลาด</div>';
+                }
+            } catch (error) {
+                console.error('Error loading health data:', error);
+                document.getElementById('healthGrid').innerHTML = '<div class="col-span-full text-center py-10 text-red-500">ไม่สามารถโหลดข้อมูลได้</div>';
+            }
+        }
+
+        async function editCard(id) {
+            try {
+                const response = await fetch('/api/health');
+                const result = await response.json();
+                if (result.success) {
+                    const rec = result.data.find(r => r.id === id);
+                    if (rec) {
+                        editId = id;
+                        document.getElementById('inputID').value = rec.cattle_code || rec.cattle_id;
+                        document.getElementById('inputName').value = rec.cattle_name || '';
+                        document.getElementById('inputBreed').value = rec.breed || '';
+                        document.getElementById('inputDate').value = rec.record_date || '';
+                        document.getElementById('inputStatus').value = mapStatusFromDb(rec.health_status);
+                        document.getElementById('inputSymptoms').value = rec.symptoms || '';
+                        document.getElementById('inputTreatment').value = rec.treatment || '';
+                        document.getElementById('inputCost').value = rec.cost || '';
+
+                        currentCowImage = rec.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                        document.getElementById('healthPreview').src = currentCowImage;
+                        toggleModal();
+                    }
+                }
+            } catch (error) {
+                console.error('Error editing:', error);
+                alert('เกิดข้อผิดพลาด');
+            }
+        }
+
+        async function deleteCard(id) {
+            if (confirm("ต้องการลบประวัติสุขภาพรายการนี้หรือไม่?")) {
+                try {
+                    const response = await fetch(`/api/health/${id}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        filterHealthData();
+                    } else {
+                        alert(result.message || 'เกิดข้อผิดพลาด');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    alert('เกิดข้อผิดพลาดในการลบ');
+                }
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('#healthModal input, #healthModal select').forEach(i => i.value = '');
+            document.getElementById('healthPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterHealthData);
+        document.getElementById('statusFilter').addEventListener('change', filterHealthData);
+
+        // Sidebar Toggle Functions
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.remove('sidebar-open');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
