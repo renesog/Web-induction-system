@@ -21,9 +21,10 @@ function getCurrentUserRole() {
 
 // Define page access permissions for each role
 const pagePermissions = {
+    'admin': ['index.html', 'cattle_info.html', 'feeding.html', 'growth.html', 'health.html', 'profile.html', 'admin.html'],
     'doctor': ['index.html', 'growth.html', 'health.html', 'profile.html'],
     'owner': ['index.html', 'cattle_info.html', 'feeding.html', 'growth.html', 'health.html', 'profile.html'],
-    'data': ['index.html', 'cattle_info.html', 'feeding.html', 'growth.html', 'profile.html']
+    'staff': ['index.html', 'cattle_info.html', 'feeding.html', 'growth.html', 'profile.html']
 };
 
 // Check if current user can access current page
@@ -50,27 +51,37 @@ function applyRoleBasedNavigation() {
 
     // Navigation permissions
     const navPermissions = {
+        'admin': {
+            'nav-cattle': true,
+            'nav-feeding': true,
+            'nav-growth': true,
+            'nav-health': true,
+            'nav-admin': true
+        },
         'doctor': {
             'nav-cattle': false,
             'nav-feeding': false,
             'nav-growth': true,
-            'nav-health': true
+            'nav-health': true,
+            'nav-admin': false
         },
         'owner': {
             'nav-cattle': true,
             'nav-feeding': true,
             'nav-growth': true,
-            'nav-health': true
+            'nav-health': true,
+            'nav-admin': false
         },
-        'data': {
+        'staff': {
             'nav-cattle': true,
             'nav-feeding': true,
             'nav-growth': true,
-            'nav-health': false
+            'nav-health': false,
+            'nav-admin': false
         }
     };
 
-    const permissions = navPermissions[role] || navPermissions['data'];
+    const permissions = navPermissions[role] || navPermissions['staff'];
 
     // Apply to nav links by ID
     Object.keys(permissions).forEach(navId => {
@@ -93,6 +104,8 @@ function applyRoleBasedNavigation() {
                 link.style.display = permissions['nav-growth'] ? 'flex' : 'none';
             } else if (href.includes('health')) {
                 link.style.display = permissions['nav-health'] ? 'flex' : 'none';
+            } else if (href.includes('admin')) {
+                link.style.display = permissions['nav-admin'] ? 'flex' : 'none';
             }
         }
     });

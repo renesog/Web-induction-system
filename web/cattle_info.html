@@ -19,10 +19,10 @@
 <body class="flex bg-[#f9fbf9]">
 
     <aside class="sidebar">
-        <div class="flex flex-col items-center mb-10">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
             <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
             <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
-        </div>
+        </a>
 
         <nav class="space-y-2 px-2">
             <a href="index.html" class="nav-link">
@@ -39,6 +39,9 @@
             </a>
             <a href="health.html" class="nav-link">
                 <i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i> ข้อมูลสุขภาพและการดูแล
+            </a>
+            <a href="admin.html" class="nav-link" id="nav-admin">
+                <i class="fa-solid fa-user-shield w-6 text-center mr-2"></i> จัดการผู้ใช้
             </a>
         </nav>
     </aside>
@@ -97,10 +100,11 @@
                         <select id="breedFilter"
                             class="p-2 border rounded-lg bg-white w-full md:w-auto shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none cursor-pointer">
                             <option value="all">สายพันธุ์ (ทั้งหมด)</option>
-                            <option value="บราห์มัน">บราห์มัน</option>
-                            <option value="ชาร์โรเลส์">ชาร์โรเลส์</option>
                             <option value="แองกัส">แองกัส</option>
-                            <option value="พื้นเมือง">พื้นเมือง</option>
+                            <option value="บราห์มัน">บราห์มัน</option>
+                            <option value="ชาร์โรเล่ส์">ชาร์โรเล่ส์</option>
+                            <option value="ลิมูซิน">ลิมูซิน</option>
+                            <option value="ซิมเมนทอล">ซิมเมนทอล</option>
                         </select>
                         <select id="penFilter"
                             class="p-2 border rounded-lg bg-white w-full md:w-auto shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none cursor-pointer">
@@ -154,9 +158,11 @@
                         <label class="text-sm font-bold text-gray-700">สายพันธุ์ :</label>
                         <select id="inputBreed"
                             class="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-400 focus:outline-none cursor-pointer">
-                            <option value="บราห์มัน">บราห์มัน</option>
-                            <option value="ชาร์โรเลส์">ชาร์โรเลส์</option>
                             <option value="แองกัส">แองกัส</option>
+                            <option value="บราห์มัน">บราห์มัน</option>
+                            <option value="ชาร์โรเล่ส์">ชาร์โรเล่ส์</option>
+                            <option value="ลิมูซิน">ลิมูซิน</option>
+                            <option value="ซิมเมนทอล">ซิมเมนทอล</option>
                         </select>
                     </div>
 
@@ -225,8 +231,20 @@
         let editId = null;
         let base64Image = "";
 
-        // Initial Load
-        window.onload = () => filterData();
+        // Initial Load - ดึงข้อมูลจาก API
+        window.onload = () => loadCattleFromAPI();
+
+        async function loadCattleFromAPI() {
+            try {
+                const response = await fetch('/api/cattle');
+                const result = await response.json();
+                if (result.success) {
+                    renderAllCattle(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading cattle:', error);
+            }
+        }
 
         function handleImage(input) {
             const reader = new FileReader();
@@ -244,98 +262,204 @@
             if (document.getElementById('cattleModal').classList.contains('hidden')) { clearForm(); editId = null; }
         }
 
-        function saveCattle() {
-            const id = document.getElementById('inputID').value;
-            const cow = {
-                id,
-                name: document.getElementById('inputName').value,
-                breed: document.getElementById('inputBreed').value,
-                ageYear: document.getElementById('inputAgeYear').value || 0,
-                ageMonth: document.getElementById('inputAgeMonth').value || 0,
-                gender: document.getElementById('inputGender').value,
-                status: document.getElementById('inputStatus').value,
-                price: document.getElementById('inputPrice').value || 0,
-                pen: document.getElementById('inputPen').value,
-                date: document.getElementById('inputDate').value,
-                image: base64Image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png" // Placeholder image
+        async function saveCattle() {
+            const cattleCode = document.getElementById('inputID').value;
+            const name = document.getElementById('inputName').value;
+            const breed = document.getElementById('inputBreed').value;
+            const ageYear = parseInt(document.getElementById('inputAgeYear').value) || 0;
+            const ageMonth = parseInt(document.getElementById('inputAgeMonth').value) || 0;
+            const genderThai = document.getElementById('inputGender').value;
+            const gender = genderThai === 'ตัวผู้' ? 'male' : 'female';
+            const status = document.getElementById('inputStatus').value;
+            const price = document.getElementById('inputPrice').value || 0;
+            const pen = document.getElementById('inputPen').value;
+            const entryDate = document.getElementById('inputDate').value;
+
+            // คำนวณวันเกิดจากอายุ
+            const today = new Date();
+            const birthDate = new Date(today.getFullYear() - ageYear, today.getMonth() - ageMonth, today.getDate());
+
+            if (!cattleCode || !name) return alert("กรุณากรอก ID และชื่อโค");
+
+            const cowData = {
+                cattle_code: cattleCode,
+                name: name,
+                breed: breed,
+                gender: gender,
+                birth_date: birthDate.toISOString().split('T')[0],
+                entry_date: entryDate || new Date().toISOString().split('T')[0],
+                source: pen,
+                status: status,
+                notes: `ราคาซื้อ: ${price} บาท`,
+                image_url: base64Image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png"
             };
-            if (!id || !cow.name) return alert("กรุณากรอก ID และชื่อโค");
-            let list = JSON.parse(localStorage.getItem('cattleMainData')) || [];
-            if (editId) { const idx = list.findIndex(c => c.id === editId); list[idx] = cow; }
-            else { if (list.some(c => c.id === id)) return alert("ID ซ้ำ!"); list.push(cow); }
-            localStorage.setItem('cattleMainData', JSON.stringify(list));
-            filterData(); toggleModal();
+
+            try {
+                let response;
+                if (editId) {
+                    // Update existing cattle
+                    response = await fetch(`/api/cattle/${editId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cowData)
+                    });
+                } else {
+                    // Create new cattle
+                    response = await fetch('/api/cattle', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cowData)
+                    });
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    loadCattleFromAPI();
+                    toggleModal();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาด');
+                }
+            } catch (error) {
+                console.error('Error saving cattle:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
+        }
+
+        function renderAllCattle(cattleList) {
+            const grid = document.getElementById('cattleGrid');
+            grid.innerHTML = '';
+
+            if (cattleList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                        <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-cow text-4xl text-gray-300"></i></div>
+                        <p class="text-xl font-medium">ยังไม่มีข้อมูลโค</p>
+                    </div>`;
+                return;
+            }
+
+            cattleList.forEach(cow => renderCard(cow));
         }
 
         function renderCard(cow) {
+            // คำนวณอายุจากวันเกิด
+            let ageText = '-';
+            if (cow.birth_date) {
+                const birth = new Date(cow.birth_date);
+                const today = new Date();
+                const years = today.getFullYear() - birth.getFullYear();
+                const months = today.getMonth() - birth.getMonth();
+                ageText = `${years} ปี ${months >= 0 ? months : 12 + months} เดือน`;
+            }
+
+            const genderThai = cow.gender === 'male' ? 'ตัวผู้' : 'ตัวเมีย';
+            const imageUrl = cow.image_url || 'https://cdn-icons-png.flaticon.com/512/1998/1998610.png';
+            const entryDate = cow.entry_date ? new Date(cow.entry_date).toLocaleDateString('th-TH') : '-';
+
             const html = `
                 <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col group">
                     <div class="h-48 overflow-hidden bg-gray-100 relative">
-                        <img src="${cow.image}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
+                        <img src="${imageUrl}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
                     </div>
                     <div class="bg-[#D1F2D3] p-4 flex-1 text-sm space-y-2 border-t border-green-100">
                         <div class="flex justify-between items-center pb-2 border-b border-green-200/50">
-                            <span class="font-bold text-[#2D4A31] text-lg">ID: ${cow.id}</span>
-                            <span class="px-2 py-1 bg-green-600 text-white text-xs rounded-full">${cow.breed}</span>
+                            <span class="font-bold text-[#2D4A31] text-lg">ID: ${cow.cattle_code}</span>
+                            <span class="px-2 py-1 bg-green-600 text-white text-xs rounded-full">${cow.breed || '-'}</span>
                         </div>
-                        <p><strong>ชื่อ :</strong> ${cow.name}</p>
-                        <p><strong>อายุ :</strong> ${cow.ageYear} ปี ${cow.ageMonth} เดือน</p>
-                        <p><strong>วันเกิด :</strong> ${cow.date || '-'}</p>
-                        <p><strong>คอก :</strong> ${cow.pen || '-'}</p>
+                        <p><strong>ชื่อ :</strong> ${cow.name || '-'}</p>
+                        <p><strong>อายุ :</strong> ${ageText}</p>
+                        <p><strong>วันนำเข้า :</strong> ${entryDate}</p>
+                        <p><strong>คอก :</strong> ${cow.source || '-'}</p>
                         <div class="flex justify-end gap-2 mt-4 pt-2">
-                            <button onclick="editCow('${cow.id}')" class="w-8 h-8 bg-white rounded-full border border-gray-200 text-gray-600 hover:text-green-600 shadow-sm transition"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="deleteCow('${cow.id}')" class="w-8 h-8 bg-white rounded-full border border-red-100 text-red-400 hover:text-red-600 shadow-sm transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <button onclick="editCow(${cow.id})" class="w-8 h-8 bg-white rounded-full border border-gray-200 text-gray-600 hover:text-green-600 shadow-sm transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteCow(${cow.id})" class="w-8 h-8 bg-white rounded-full border border-red-100 text-red-400 hover:text-red-600 shadow-sm transition"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 </div>`;
-            document.getElementById('cattleGrid').insertAdjacentHTML('afterbegin', html);
+            document.getElementById('cattleGrid').insertAdjacentHTML('beforeend', html);
         }
 
-        function filterData() {
+        async function filterData() {
             const s = document.getElementById('searchInput').value.toLowerCase();
             const b = document.getElementById('breedFilter').value;
-            const p = document.getElementById('penFilter').value;
-            let list = JSON.parse(localStorage.getItem('cattleMainData')) || [];
 
-            document.getElementById('cattleGrid').innerHTML = '';
+            try {
+                const response = await fetch('/api/cattle');
+                const result = await response.json();
 
-            const filtered = list.filter(c => {
-                const matchSearch = c.id.toLowerCase().includes(s) || c.name.toLowerCase().includes(s);
-                const matchBreed = b === 'all' || c.breed === b;
-                const matchPen = p === 'all' || c.pen === p;
-                return matchSearch && matchBreed && matchPen;
-            });
+                if (result.success) {
+                    let filtered = result.data.filter(c => {
+                        const matchSearch = (c.cattle_code && c.cattle_code.toLowerCase().includes(s)) ||
+                            (c.name && c.name.toLowerCase().includes(s));
+                        const matchBreed = b === 'all' || c.breed === b;
+                        return matchSearch && matchBreed;
+                    });
 
-            if (filtered.length === 0) {
-                document.getElementById('cattleGrid').innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
-                        <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
-                        <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
-                    </div>`;
-            } else {
-                filtered.forEach(c => renderCard(c));
+                    renderAllCattle(filtered);
+                }
+            } catch (error) {
+                console.error('Error filtering:', error);
             }
         }
 
-        function editCow(id) {
-            let list = JSON.parse(localStorage.getItem('cattleMainData')) || [];
-            const c = list.find(x => x.id === id);
-            if (c) {
-                editId = id; document.getElementById('inputID').value = c.id; document.getElementById('inputName').value = c.name;
-                document.getElementById('inputBreed').value = c.breed; document.getElementById('inputAgeYear').value = c.ageYear;
-                document.getElementById('inputAgeMonth').value = c.ageMonth; document.getElementById('inputGender').value = c.gender;
-                document.getElementById('inputStatus').value = c.status; document.getElementById('inputPrice').value = c.price;
-                document.getElementById('inputPen').value = c.pen; document.getElementById('inputDate').value = c.date;
-                base64Image = c.image; document.getElementById('previewImage').src = c.image;
-                document.getElementById('previewImage').classList.remove('hidden'); document.getElementById('placeholderText').classList.add('hidden');
-                toggleModal();
+        async function editCow(id) {
+            try {
+                const response = await fetch(`/api/cattle/${id}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const c = result.data;
+                    editId = id;
+                    document.getElementById('inputID').value = c.cattle_code;
+                    document.getElementById('inputName').value = c.name || '';
+                    document.getElementById('inputBreed').value = c.breed || 'บราห์มัน';
+
+                    // คำนวณอายุ
+                    if (c.birth_date) {
+                        const birth = new Date(c.birth_date);
+                        const today = new Date();
+                        document.getElementById('inputAgeYear').value = today.getFullYear() - birth.getFullYear();
+                        document.getElementById('inputAgeMonth').value = today.getMonth() - birth.getMonth();
+                    }
+
+                    document.getElementById('inputGender').value = c.gender === 'male' ? 'ตัวผู้' : 'ตัวเมีย';
+                    document.getElementById('inputStatus').value = c.status || 'พ่อพันธุ์ / แม่พันธุ์';
+                    document.getElementById('inputPen').value = c.source || '';
+                    document.getElementById('inputDate').value = c.entry_date ? c.entry_date.split('T')[0] : '';
+
+                    if (c.image_url) {
+                        base64Image = c.image_url;
+                        document.getElementById('previewImage').src = c.image_url;
+                        document.getElementById('previewImage').classList.remove('hidden');
+                        document.getElementById('placeholderText').classList.add('hidden');
+                    }
+
+                    toggleModal();
+                }
+            } catch (error) {
+                console.error('Error editing:', error);
             }
         }
 
-        function deleteCow(id) {
-            if (confirm("ต้องการลบข้อมูลโค ID: " + id + " หรือไม่?")) {
-                let list = JSON.parse(localStorage.getItem('cattleMainData')) || [];
-                list = list.filter(c => c.id !== id); localStorage.setItem('cattleMainData', JSON.stringify(list)); filterData();
+        async function deleteCow(id) {
+            if (confirm("ต้องการลบข้อมูลโค หรือไม่?")) {
+                try {
+                    const response = await fetch(`/api/cattle/${id}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                        loadCattleFromAPI();
+                    } else {
+                        alert(result.message || 'เกิดข้อผิดพลาด');
+                    }
+                } catch (error) {
+                    console.error('Error deleting:', error);
+                    alert('เกิดข้อผิดพลาดในการลบ');
+                }
             }
         }
 
@@ -348,7 +472,6 @@
 
         document.getElementById('searchInput').addEventListener('input', filterData);
         document.getElementById('breedFilter').addEventListener('change', filterData);
-        document.getElementById('penFilter').addEventListener('change', filterData);
 
         // Sidebar Toggle Functions
         function toggleSidebar() {

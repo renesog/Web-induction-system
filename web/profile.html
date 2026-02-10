@@ -22,10 +22,10 @@
 <body class="flex bg-[#f9fbf9]">
 
     <aside class="sidebar">
-        <div class="flex flex-col items-center mb-10">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
             <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
             <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
-        </div>
+        </a>
 
         <nav class="space-y-2 px-2">
             <a href="index.html" class="nav-link">
@@ -42,6 +42,9 @@
             </a>
             <a href="health.html" class="nav-link">
                 <i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i> ข้อมูลสุขภาพและการดูแล
+            </a>
+            <a href="admin.html" class="nav-link" id="nav-admin">
+                <i class="fa-solid fa-user-shield w-6 text-center mr-2"></i> จัดการผู้ใช้
             </a>
         </nav>
     </aside>
@@ -201,6 +204,7 @@
     <script>
         const profileBtn = document.getElementById('profileBtn');
         const profileDropdown = document.getElementById('profileDropdown');
+        let currentUser = null;
 
         if (profileBtn && profileDropdown) {
             profileBtn.addEventListener('click', (e) => {
@@ -234,17 +238,36 @@
             });
         });
 
-        // Profile Image Upload Functions
+        // Check if user is owner
+        function isOwner() {
+            return currentUser && currentUser.role === 'owner';
+        }
+
+        // Apply role-based UI
+        function applyRoleBasedUI() {
+            const farmNameField = document.getElementById('farmName');
+            const farmNameContainer = farmNameField ? farmNameField.closest('.space-y-1') : null;
+
+            if (!isOwner()) {
+                // Only disable farm name field for non-owners
+                if (farmNameField) {
+                    farmNameField.readOnly = true;
+                    farmNameField.style.backgroundColor = '#f0f0f0';
+                    farmNameField.placeholder = 'เฉพาะเจ้าของฟาร์มเท่านั้นที่แก้ไขได้';
+                }
+            }
+        }
+
+        // Profile Image Upload Functions (all roles can upload)
         function handleImageUpload(event) {
+
             const file = event.target.files[0];
             if (file) {
-                // Validate file type
                 if (!file.type.startsWith('image/')) {
                     alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
                     return;
                 }
 
-                // Validate file size (max 2MB)
                 if (file.size > 2 * 1024 * 1024) {
                     alert('ขนาดไฟล์ต้องไม่เกิน 2MB');
                     return;
@@ -253,12 +276,7 @@
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     const imageData = e.target.result;
-
-                    // Display the image
                     displayProfileImage(imageData);
-
-                    // Save to localStorage
-                    localStorage.setItem('userProfileImage', imageData);
                 };
                 reader.readAsDataURL(file);
             }
@@ -278,80 +296,75 @@
             }
         }
 
-        function loadProfileImage() {
-            const savedImage = localStorage.getItem('userProfileImage');
-            if (savedImage) {
-                displayProfileImage(savedImage);
-            }
-        }
-
         // Mode switching functions
         function switchToViewMode() {
-            const savedProfile = localStorage.getItem('userProfile');
-            if (savedProfile) {
-                const profileData = JSON.parse(savedProfile);
-
-                // Update view mode display
-                document.getElementById('viewFirstName').textContent = profileData.firstName || '-';
-                document.getElementById('viewLastName').textContent = profileData.lastName || '-';
-                document.getElementById('viewEmail').textContent = profileData.email || '-';
-                document.getElementById('viewPhone').textContent = profileData.phone || '-';
-                document.getElementById('viewFarmName').textContent = profileData.farmName || '-';
-
-                // Show view mode, hide edit mode
-                document.getElementById('viewModeContainer').classList.remove('hidden');
-                document.getElementById('editModeContainer').classList.add('hidden');
-            }
+            document.getElementById('viewModeContainer').classList.remove('hidden');
+            document.getElementById('editModeContainer').classList.add('hidden');
         }
 
         function switchToEditMode() {
-            // Show edit mode, hide view mode
             document.getElementById('viewModeContainer').classList.add('hidden');
             document.getElementById('editModeContainer').classList.remove('hidden');
+            // Apply role-based restrictions after switching
+            applyRoleBasedUI();
+        }
 
-            // Populate input fields with existing data
-            const savedProfile = localStorage.getItem('userProfile');
-            if (savedProfile) {
-                const profileData = JSON.parse(savedProfile);
-                document.getElementById('firstName').value = profileData.firstName || '';
-                document.getElementById('lastName').value = profileData.lastName || '';
-                document.getElementById('email').value = profileData.email || '';
-                document.getElementById('phone').value = profileData.phone || '';
-                document.getElementById('farmName').value = profileData.farmName || '';
+        // Save Profile via API (all roles can save)
+        async function saveProfile() {
+
+            const profileData = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                profile_image: document.getElementById('profileImage').src || null,
+                requester_role: currentUser.role
+            };
+
+            try {
+                // Save user profile
+                const response = await fetch(`/api/profile/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+
+                const data = await response.json();
+
+                // If owner, also save farm settings
+                if (isOwner()) {
+                    const farmData = {
+                        farm_name: document.getElementById('farmName').value,
+                        requester_role: currentUser.role
+                    };
+                    await fetch('/api/farm-settings', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(farmData)
+                    });
+                }
+
+                if (data.success) {
+                    alert('บันทึกข้อมูลสำเร็จ!');
+                    await loadProfile();
+                    switchToViewMode();
+                } else {
+                    alert(data.message || 'เกิดข้อผิดพลาดในการบันทึก');
+                }
+            } catch (error) {
+                console.error('Save profile error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
             }
         }
 
-        // Profile Save and Load Functions
-        function saveProfile() {
-            const profileData = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                farmName: document.getElementById('farmName').value
-            };
-
-            localStorage.setItem('userProfile', JSON.stringify(profileData));
-
-            // Update header display
-            updateHeaderDisplay(profileData);
-
-            // Switch to view mode
-            switchToViewMode();
-
-            // Show success message
-            alert('บันทึกข้อมูลสำเร็จ!');
-        }
-
-        function updateHeaderDisplay(profileData) {
+        function updateHeaderDisplay(profileData, farmName) {
             const displayName = document.getElementById('displayName');
             const displayEmail = document.getElementById('displayEmail');
             const displayPhone = document.getElementById('displayPhone');
             const displayFarm = document.getElementById('displayFarm');
 
             if (displayName) {
-                const fullName = (profileData.firstName || '') + ' ' + (profileData.lastName || '');
-                displayName.textContent = fullName.trim() || '-';
+                const fullName = (profileData.first_name || '') + ' ' + (profileData.last_name || '');
+                displayName.textContent = fullName.trim() || currentUser.username || '-';
             }
             if (displayEmail) {
                 displayEmail.innerHTML = '<i class="fa-regular fa-envelope mr-2"></i>' + (profileData.email || '-');
@@ -360,40 +373,80 @@
                 displayPhone.innerHTML = '<i class="fa-solid fa-phone mr-2"></i>' + (profileData.phone || '-');
             }
             if (displayFarm) {
-                displayFarm.innerHTML = '<i class="fa-solid fa-house-chimney mr-2"></i>' + (profileData.farmName || '-');
+                displayFarm.innerHTML = '<i class="fa-solid fa-house-chimney mr-2"></i>' + (farmName || '-');
             }
         }
 
-        function loadProfile() {
-            const savedProfile = localStorage.getItem('userProfile');
+        function updateViewMode(profileData, farmName) {
+            document.getElementById('viewFirstName').textContent = profileData.first_name || '-';
+            document.getElementById('viewLastName').textContent = profileData.last_name || '-';
+            document.getElementById('viewEmail').textContent = profileData.email || '-';
+            document.getElementById('viewPhone').textContent = profileData.phone || '-';
+            document.getElementById('viewFarmName').textContent = farmName || '-';
+        }
 
-            if (savedProfile) {
-                const profileData = JSON.parse(savedProfile);
+        function updateEditMode(profileData, farmName) {
+            document.getElementById('firstName').value = profileData.first_name || '';
+            document.getElementById('lastName').value = profileData.last_name || '';
+            document.getElementById('email').value = profileData.email || '';
+            document.getElementById('phone').value = profileData.phone || '';
+            document.getElementById('farmName').value = farmName || '';
+        }
 
-                // Update header display
-                updateHeaderDisplay(profileData);
+        // Load Profile from API
+        async function loadProfile() {
+            if (!currentUser) return;
 
-                // Check if profile has any data - if so, show view mode
-                const hasData = profileData.firstName || profileData.lastName || profileData.email || profileData.phone || profileData.farmName;
+            try {
+                // Load user profile
+                const profileResponse = await fetch(`/api/profile/${currentUser.id}`);
+                const profileResult = await profileResponse.json();
 
-                if (hasData) {
-                    switchToViewMode();
-                } else {
-                    // No data yet, show edit mode
-                    document.getElementById('viewModeContainer').classList.add('hidden');
-                    document.getElementById('editModeContainer').classList.remove('hidden');
+                // Load farm settings (shared)
+                const farmResponse = await fetch('/api/farm-settings');
+                const farmResult = await farmResponse.json();
+
+                if (profileResult.success) {
+                    const profileData = profileResult.data;
+                    const farmName = farmResult.success ? farmResult.data.farm_name : '';
+
+                    // Update displays
+                    updateHeaderDisplay(profileData, farmName);
+                    updateViewMode(profileData, farmName);
+                    updateEditMode(profileData, farmName);
+
+                    // Display profile image
+                    if (profileData.profile_image) {
+                        displayProfileImage(profileData.profile_image);
+                    }
+
+                    // Check if has data
+                    const hasData = profileData.first_name || profileData.last_name || profileData.phone || farmName;
+
+                    if (hasData) {
+                        switchToViewMode();
+                    } else {
+                        document.getElementById('viewModeContainer').classList.add('hidden');
+                        document.getElementById('editModeContainer').classList.remove('hidden');
+                    }
                 }
-            } else {
-                // No saved profile, show edit mode
-                document.getElementById('viewModeContainer').classList.add('hidden');
-                document.getElementById('editModeContainer').classList.remove('hidden');
+            } catch (error) {
+                console.error('Load profile error:', error);
             }
         }
 
-        // Load profile data when page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            loadProfile();
-            loadProfileImage();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Get current user from session
+            const userSession = sessionStorage.getItem('currentUser');
+            if (userSession) {
+                currentUser = JSON.parse(userSession);
+            }
+
+            if (currentUser) {
+                await loadProfile();
+                applyRoleBasedUI();
+            }
         });
     </script>
 </body>

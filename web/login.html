@@ -26,7 +26,7 @@
         </div>
       </div>
       <script>
-        function handleLogin(event) {
+        async function handleLogin(event) {
           event.preventDefault();
           const username = document.getElementById('username').value.trim();
           const password = document.getElementById('password').value;
@@ -36,26 +36,33 @@
             return false;
           }
 
-          // Get registered users from localStorage
-          const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+          try {
+            const response = await fetch('/api/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ username, password })
+            });
 
-          // Find user by username (with role suffix)
-          const user = users.find(u => u.username === username && u.password === password);
+            const data = await response.json();
 
-          if (user) {
-            // Save current user to sessionStorage
-            const currentUser = {
-              username: user.username,
-              email: user.email,
-              role: user.role,
-              loginTime: new Date().toISOString()
-            };
-            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            if (data.success) {
+              // Save current user to sessionStorage
+              const currentUser = {
+                ...data.user,
+                loginTime: new Date().toISOString()
+              };
+              sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-            // Redirect to dashboard
-            window.location.href = 'index.html';
-          } else {
-            alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+              // Redirect to dashboard
+              window.location.href = 'index.html';
+            } else {
+              alert(data.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
           }
           return false;
         }

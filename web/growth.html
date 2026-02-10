@@ -20,10 +20,10 @@
 <body class="flex bg-[#f9fbf9]">
 
     <aside class="sidebar">
-        <div class="flex flex-col items-center mb-10">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
             <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
             <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
-        </div>
+        </a>
 
         <nav class="space-y-2 px-2">
             <a href="index.html" class="nav-link"><i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก</a>
@@ -35,6 +35,9 @@
                 ข้อมูลการเจริญเติบโต</a>
             <a href="health.html" class="nav-link"><i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i>
                 ข้อมูลสุขภาพและการดูแล</a>
+            <a href="admin.html" class="nav-link" id="nav-admin"><i
+                    class="fa-solid fa-user-shield w-6 text-center mr-2"></i>
+                จัดการผู้ใช้</a>
         </nav>
     </aside>
 
@@ -229,20 +232,33 @@
 
         window.onload = () => filterGrowthData();
 
-        function pullData() {
+        async function pullData() {
             const tid = document.getElementById('inputID').value;
-            const mainData = JSON.parse(localStorage.getItem('cattleMainData')) || [];
-            const cow = mainData.find(c => c.id === tid);
-            if (cow) {
-                document.getElementById('inputName').value = cow.name;
-                document.getElementById('inputBreed').value = cow.breed;
-                currentCowImage = cow.image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
-                document.getElementById('growthPreview').src = currentCowImage;
-            } else {
-                alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก");
-                document.getElementById('inputName').value = "";
-                document.getElementById('inputBreed').value = "";
-                document.getElementById('growthPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+            if (!tid) {
+                alert("กรุณากรอก ID โค");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cattle/${tid}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const cow = result.data; // ดึงข้อมูลจาก data property
+                    document.getElementById('inputName').value = cow.name || '';
+                    document.getElementById('inputBreed').value = cow.breed || '';
+                    document.getElementById('inputGender').value = cow.gender === 'female' ? 'เมีย' : 'ผู้';
+                    document.getElementById('inputStatus').value = cow.status || '';
+                    currentCowImage = cow.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                    document.getElementById('growthPreview').src = currentCowImage;
+                } else {
+                    alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก");
+                    document.getElementById('inputName').value = "";
+                    document.getElementById('inputBreed').value = "";
+                    document.getElementById('growthPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                }
+            } catch (error) {
+                console.error('Error fetching cattle:', error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ API");
             }
         }
 
@@ -251,102 +267,175 @@
             if (document.getElementById('growthModal').classList.contains('hidden')) { editId = null; clearForm(); }
         }
 
-        function saveGrowthData() {
-            const start = parseFloat(document.getElementById('inputWeightStart').value || 0);
-            const latest = parseFloat(document.getElementById('inputWeightLatest').value || 0);
-            const cow = {
-                id: document.getElementById('inputID').value, name: document.getElementById('inputName').value,
-                breed: document.getElementById('inputBreed').value, weightStart: start, weightLatest: latest,
-                date: document.getElementById('inputDate').value, status: document.getElementById('inputStatus').value,
-                gender: document.getElementById('inputGender').value, recorder: document.getElementById('inputRecorder').value,
-                image: currentCowImage, adg: ((latest - start) / 30).toFixed(2)
-            };
-            if (!cow.id || !cow.name) return alert("กรุณาระบุ ID และกดปุ่มดึงข้อมูล");
-            let list = JSON.parse(localStorage.getItem('cattleGrowthData')) || [];
-            if (editId) { const idx = list.findIndex(c => c.id === editId); list[idx] = cow; }
-            else { list.push(cow); }
-            localStorage.setItem('cattleGrowthData', JSON.stringify(list));
-            filterGrowthData(); toggleModal();
+        async function saveGrowthData() {
+            const cattle_id = document.getElementById('inputID').value;
+            const initial_weight = parseFloat(document.getElementById('inputWeightStart').value) || null;
+            const latest_weight = parseFloat(document.getElementById('inputWeightLatest').value) || null;
+            const record_date = document.getElementById('inputDate').value;
+            const recorded_by = document.getElementById('inputRecorder').value;
+
+            if (!cattle_id || !record_date) {
+                return alert("กรุณาระบุ ID โค และวันที่ชั่งน้ำหนัก");
+            }
+
+            try {
+                const method = editId ? 'PUT' : 'POST';
+                const url = editId ? `/api/growth/${editId}` : '/api/growth';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cattle_id, initial_weight, latest_weight, record_date, recorded_by
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    filterGrowthData();
+                    toggleModal();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาด');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
         }
 
         function renderCard(cow) {
-            // คำนวณสีของ ADG (ถ้าโตดีเป็นสีเขียว ถ้าติดลบเป็นสีแดง)
-            let adgColor = parseFloat(cow.adg) >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+            // คำนวณ ADG (Average Daily Gain)
+            const weightStart = parseFloat(cow.initial_weight) || 0;
+            const weightLatest = parseFloat(cow.latest_weight) || 0;
+            const adg = ((weightLatest - weightStart) / 30).toFixed(2);
+            let adgColor = parseFloat(adg) >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+            const imageUrl = cow.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+            const cattleName = cow.cattle_name || cow.name || '-';
+            const cattleId = cow.cattle_code || cow.cattle_id || cow.id;
 
             const html = `
                 <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col group">
                     <div class="h-44 overflow-hidden bg-gray-100 relative">
-                        <img src="${cow.image}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
+                        <img src="${imageUrl}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
                         <div class="absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-bold ${adgColor} shadow-sm backdrop-blur-sm">
-                            ADG: ${cow.adg}
+                            ADG: ${adg}
                         </div>
                     </div>
                     <div class="p-4 flex-1 text-sm space-y-2">
                         <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                            <span class="font-bold text-lg text-gray-800">${cow.name}</span>
-                            <span class="text-xs text-gray-500">ID: ${cow.id}</span>
+                            <span class="font-bold text-lg text-gray-800">${cattleName}</span>
+                            <span class="text-xs text-gray-500">ID: ${cattleId}</span>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-2 my-2">
                             <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
                                 <p class="text-xs text-gray-400">เริ่มต้น</p>
-                                <p class="font-bold text-gray-700">${cow.weightStart} กก.</p>
+                                <p class="font-bold text-gray-700">${weightStart} กก.</p>
                             </div>
                             <div class="bg-green-50 p-2 rounded-lg text-center border border-green-100">
                                 <p class="text-xs text-green-600">ล่าสุด</p>
-                                <p class="font-bold text-green-800">${cow.weightLatest} กก.</p>
+                                <p class="font-bold text-green-800">${weightLatest} กก.</p>
                             </div>
                         </div>
 
-                        <p class="text-gray-600 text-xs"><i class="fa-regular fa-calendar mr-1 text-green-500"></i> ชั่งเมื่อ: ${cow.date || '-'}</p>
-                        <p class="text-gray-600 text-xs"><i class="fa-solid fa-user-pen mr-1 text-green-500"></i> ผู้บันทึก: ${cow.recorder}</p>
+                        <p class="text-gray-600 text-xs"><i class="fa-regular fa-calendar mr-1 text-green-500"></i> ชั่งเมื่อ: ${cow.record_date || '-'}</p>
+                        <p class="text-gray-600 text-xs"><i class="fa-solid fa-user-pen mr-1 text-green-500"></i> ผู้บันทึก: ${cow.recorded_by || '-'}</p>
                         
                         <div class="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
-                            <button onclick="editCard('${cow.id}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-500 hover:text-blue-600 hover:border-blue-300 transition"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="deleteCard('${cow.id}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-500 hover:text-red-600 hover:border-red-300 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <button onclick="editCard(${cow.id})" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-500 hover:text-blue-600 hover:border-blue-300 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteCard(${cow.id})" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-500 hover:text-red-600 hover:border-red-300 transition"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 </div>`;
             document.getElementById('growthGrid').insertAdjacentHTML('afterbegin', html);
         }
 
-        function filterGrowthData() {
+        async function filterGrowthData() {
             const s = document.getElementById('searchInput').value.toLowerCase();
             const b = document.getElementById('breedFilter').value;
-            let list = JSON.parse(localStorage.getItem('cattleGrowthData')) || [];
-            document.getElementById('growthGrid').innerHTML = '';
+            document.getElementById('growthGrid').innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">กำลังโหลด...</div>';
 
-            const filtered = list.filter(c => (c.id.toLowerCase().includes(s) || (c.name && c.name.toLowerCase().includes(s))) &&
-                (b === 'all' || c.breed === b));
+            try {
+                const response = await fetch('/api/growth');
+                const result = await response.json();
 
-            if (filtered.length === 0) {
-                document.getElementById('growthGrid').innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
-                        <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
-                        <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
-                    </div>`;
-            } else {
-                filtered.forEach(c => renderCard(c));
+                if (result.success) {
+                    let list = result.data || [];
+                    document.getElementById('growthGrid').innerHTML = '';
+
+                    const filtered = list.filter(c => {
+                        const cattleId = (c.cattle_code || c.cattle_id || '').toString().toLowerCase();
+                        const cattleName = (c.cattle_name || c.name || '').toLowerCase();
+                        const breed = c.breed || '';
+
+                        const matchSearch = cattleId.includes(s) || cattleName.includes(s);
+                        const matchBreed = b === 'all' || breed === b;
+
+                        return matchSearch && matchBreed;
+                    });
+
+                    if (filtered.length === 0) {
+                        document.getElementById('growthGrid').innerHTML = `
+                            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                                <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
+                                <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
+                            </div>`;
+                    } else {
+                        filtered.forEach(c => renderCard(c));
+                    }
+                } else {
+                    document.getElementById('growthGrid').innerHTML = '<div class="col-span-full text-center py-10 text-red-500">เกิดข้อผิดพลาด</div>';
+                }
+            } catch (error) {
+                console.error('Error loading growth data:', error);
+                document.getElementById('growthGrid').innerHTML = '<div class="col-span-full text-center py-10 text-red-500">ไม่สามารถโหลดข้อมูลได้</div>';
             }
         }
 
-        function editCard(id) {
-            const list = JSON.parse(localStorage.getItem('cattleGrowthData')) || [];
-            const cow = list.find(c => c.id === id);
-            if (cow) {
-                editId = id; document.getElementById('inputID').value = cow.id; document.getElementById('inputName').value = cow.name;
-                document.getElementById('inputWeightStart').value = cow.weightStart; document.getElementById('inputWeightLatest').value = cow.weightLatest;
-                document.getElementById('inputBreed').value = cow.breed; document.getElementById('inputDate').value = cow.date;
-                document.getElementById('inputStatus').value = cow.status; document.getElementById('inputGender').value = cow.gender;
-                document.getElementById('inputRecorder').value = cow.recorder; currentCowImage = cow.image;
-                document.getElementById('growthPreview').src = cow.image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png"; toggleModal();
+        async function editCard(id) {
+            try {
+                const response = await fetch('/api/growth');
+                const result = await response.json();
+                if (result.success) {
+                    const cow = result.data.find(c => c.id === id);
+                    if (cow) {
+                        editId = id;
+                        document.getElementById('inputID').value = cow.cattle_code || cow.cattle_id;
+                        document.getElementById('inputName').value = cow.cattle_name || '';
+                        document.getElementById('inputWeightStart').value = cow.initial_weight || '';
+                        document.getElementById('inputWeightLatest').value = cow.latest_weight || '';
+                        document.getElementById('inputBreed').value = cow.breed || '';
+                        document.getElementById('inputDate').value = cow.record_date || '';
+                        document.getElementById('inputStatus').value = cow.status || '';
+                        document.getElementById('inputGender').value = cow.gender === 'female' ? 'เมีย' : 'ผู้';
+                        document.getElementById('inputRecorder').value = cow.recorded_by || '';
+                        currentCowImage = cow.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                        document.getElementById('growthPreview').src = currentCowImage;
+                        toggleModal();
+                    }
+                }
+            } catch (error) {
+                console.error('Error editing:', error);
+                alert('เกิดข้อผิดพลาด');
             }
         }
 
-        function deleteCard(id) {
+        async function deleteCard(id) {
             if (confirm("ต้องการลบข้อมูลการเจริญเติบโตนี้หรือไม่?")) {
-                let list = JSON.parse(localStorage.getItem('cattleGrowthData')) || [];
-                list = list.filter(c => c.id !== id); localStorage.setItem('cattleGrowthData', JSON.stringify(list)); filterGrowthData();
+                try {
+                    const response = await fetch(`/api/growth/${id}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        filterGrowthData();
+                    } else {
+                        alert(result.message || 'เกิดข้อผิดพลาด');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    alert('เกิดข้อผิดพลาดในการลบ');
+                }
             }
         }
 

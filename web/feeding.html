@@ -19,10 +19,10 @@
 <body class="flex bg-[#f9fbf9]">
 
     <aside class="sidebar">
-        <div class="flex flex-col items-center mb-10">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
             <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
             <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
-        </div>
+        </a>
         <nav class="space-y-2 px-2">
             <a href="index.html" class="nav-link"><i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก</a>
             <a href="cattle_info.html" class="nav-link"><i class="fa-solid fa-cow w-6 text-center mr-2"></i>
@@ -33,6 +33,9 @@
                 ข้อมูลการเจริญเติบโต</a>
             <a href="health.html" class="nav-link"><i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i>
                 ข้อมูลสุขภาพและการดูแล</a>
+            <a href="admin.html" class="nav-link" id="nav-admin"><i
+                    class="fa-solid fa-user-shield w-6 text-center mr-2"></i>
+                จัดการผู้ใช้</a>
         </nav>
     </aside>
 
@@ -192,24 +195,35 @@
         window.onload = () => filterFeedingData();
 
         // --- 2. Pull Data Function ---
-        function pullData() {
+        async function pullData() {
             const tid = document.getElementById('inputID').value;
-            const mainData = JSON.parse(localStorage.getItem('cattleMainData')) || [];
-            const cow = mainData.find(c => c.id === tid);
+            if (!tid) {
+                alert("กรุณากรอก ID โค");
+                return;
+            }
 
-            if (cow) {
-                document.getElementById('inputName').value = cow.name;
-                document.getElementById('inputBreed').value = cow.breed;
-                document.getElementById('inputPen').value = cow.pen || '-';
+            try {
+                const response = await fetch(`/api/cattle/${tid}`);
+                const result = await response.json();
 
-                currentCowImage = cow.image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
-                document.getElementById('cowPreview').src = currentCowImage;
-            } else {
-                alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก");
-                document.getElementById('inputName').value = "";
-                document.getElementById('inputBreed').value = "";
-                document.getElementById('inputPen').value = "";
-                document.getElementById('cowPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                if (result.success && result.data) {
+                    const cow = result.data;
+                    document.getElementById('inputName').value = cow.name || '';
+                    document.getElementById('inputBreed').value = cow.breed || '';
+                    document.getElementById('inputPen').value = cow.source || '-';
+
+                    currentCowImage = cow.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                    document.getElementById('cowPreview').src = currentCowImage;
+                } else {
+                    alert("ไม่พบ ID: " + tid + " ในฐานข้อมูลหลัก");
+                    document.getElementById('inputName').value = "";
+                    document.getElementById('inputBreed').value = "";
+                    document.getElementById('inputPen').value = "";
+                    document.getElementById('cowPreview').src = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                }
+            } catch (error) {
+                console.error('Error fetching cattle:', error);
+                alert("เกิดข้อผิดพลาดในการดึงข้อมูล");
             }
         }
 
@@ -219,119 +233,193 @@
             if (document.getElementById('feedingModal').classList.contains('hidden')) { editId = null; clearForm(); }
         }
 
-        function saveFeedingData() {
+        async function saveFeedingData() {
             const id = document.getElementById('inputID').value;
             const name = document.getElementById('inputName').value;
 
             if (!id || !name) return alert("กรุณาระบุ ID และกดปุ่ม 'ดึงข้อมูล' ก่อนบันทึก");
 
-            const record = {
-                id: id,
-                name: name,
-                breed: document.getElementById('inputBreed').value,
-                pen: document.getElementById('inputPen').value,
-                date: document.getElementById('inputDate').value,
-                feedType: document.getElementById('inputFeedType').value,
-                amount: document.getElementById('inputAmount').value || 0,
-                cost: document.getElementById('inputCost').value || 0,
-                officer: document.getElementById('inputOfficer').value,
-                image: currentCowImage,
-                recordId: Date.now().toString()
+            const feedDate = document.getElementById('inputDate').value;
+            const quantity = document.getElementById('inputAmount').value;
+
+            if (!feedDate || !quantity) return alert("กรุณากรอกวันที่และปริมาณอาหาร");
+
+            const data = {
+                cattle_id: id,
+                feed_date: feedDate,
+                quantity: parseFloat(quantity) || 0,
+                cost: parseFloat(document.getElementById('inputCost').value) || 0,
+                notes: document.getElementById('inputFeedType').value + ' - ' + (document.getElementById('inputOfficer').value || ''),
+                unit: 'kg'
             };
 
-            let list = JSON.parse(localStorage.getItem('cattleFeedingData')) || [];
-            if (editId) {
-                const idx = list.findIndex(r => r.recordId === editId);
-                if (idx !== -1) list[idx] = { ...record, recordId: editId };
-            } else {
-                list.push(record);
-            }
+            try {
+                let response;
+                if (editId) {
+                    response = await fetch(`/api/feeding/${editId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await fetch('/api/feeding', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
 
-            localStorage.setItem('cattleFeedingData', JSON.stringify(list));
-            filterFeedingData(); toggleModal();
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    filterFeedingData();
+                    toggleModal();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาด');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
         }
 
         function renderCard(rec) {
+            const image = rec.image_url || rec.image || 'https://cdn-icons-png.flaticon.com/512/1998/1998610.png';
+            const name = rec.cattle_name || rec.name || '-';
+            const cattleCode = rec.cattle_code || rec.id || '-';
+            const breed = rec.breed || '-';
+            const feedType = rec.feed_type_name || rec.notes || '-';
+            const date = rec.feed_date ? new Date(rec.feed_date).toLocaleDateString('th-TH') : '-';
+            const recordId = rec.id || rec.recordId;
+
             const html = `
                 <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col group">
                     <div class="h-40 overflow-hidden bg-gray-100 relative">
-                        <img src="${rec.image}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
+                        <img src="${image}" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1998/1998610.png'">
                         <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-3">
-                            <h3 class="text-white font-bold text-lg">${rec.name}</h3>
-                            <p class="text-green-200 text-xs font-medium">#${rec.id} | ${rec.breed}</p>
+                            <h3 class="text-white font-bold text-lg">${name}</h3>
+                            <p class="text-green-200 text-xs font-medium">#${cattleCode} | ${breed}</p>
                         </div>
                     </div>
                     <div class="p-4 flex-1 text-sm space-y-2 bg-orange-50/30">
                         <div class="flex justify-between text-xs text-gray-500 mb-2">
-                            <span><i class="fa-solid fa-layer-group mr-1"></i> ${rec.pen}</span>
-                            <span><i class="fa-regular fa-calendar mr-1"></i> ${rec.date || '-'}</span>
+                            <span><i class="fa-solid fa-layer-group mr-1"></i> ${rec.unit || 'kg'}</span>
+                            <span><i class="fa-regular fa-calendar mr-1"></i> ${date}</span>
                         </div>
-                        <p class="font-bold text-gray-800"><i class="fa-solid fa-bowl-rice text-orange-500 mr-2"></i> ${rec.feedType}</p>
-                        <p><i class="fa-solid fa-weight-hanging text-gray-400 mr-2 w-4"></i> ${rec.amount} กก.</p>
-                        <p><i class="fa-solid fa-coins text-gray-400 mr-2 w-4"></i> ${rec.cost} บาท</p>
-                        <p class="text-xs text-gray-400 mt-2">ผู้ให้: ${rec.officer || '-'}</p>
+                        <p class="font-bold text-gray-800"><i class="fa-solid fa-bowl-rice text-orange-500 mr-2"></i> ${feedType}</p>
+                        <p><i class="fa-solid fa-weight-hanging text-gray-400 mr-2 w-4"></i> ${rec.quantity || 0} กก.</p>
+                        <p><i class="fa-solid fa-coins text-gray-400 mr-2 w-4"></i> ${rec.cost || 0} บาท</p>
                         
                         <div class="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
-                            <button onclick="editCard('${rec.recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-blue-600 transition"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="deleteCard('${rec.recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-red-600 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <button onclick="editCard('${recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-blue-600 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteCard('${recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-red-600 transition"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 </div>`;
             document.getElementById('feedingGrid').insertAdjacentHTML('afterbegin', html);
         }
 
-        function filterFeedingData() {
+        async function filterFeedingData() {
             const s = document.getElementById('searchInput').value.toLowerCase();
             const fType = document.getElementById('feedTypeFilter').value;
-            const pen = document.getElementById('penFilter').value;
-            let list = JSON.parse(localStorage.getItem('cattleFeedingData')) || [];
 
-            document.getElementById('feedingGrid').innerHTML = '';
+            document.getElementById('feedingGrid').innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">กำลังโหลด...</div>';
 
-            const filtered = list.filter(r => {
-                const matchSearch = r.id.toLowerCase().includes(s) || r.name.toLowerCase().includes(s);
-                const matchType = fType === 'all' || r.feedType === fType;
-                const matchPen = pen === 'all' || r.pen === pen;
-                return matchSearch && matchType && matchPen;
-            });
+            try {
+                const response = await fetch('/api/feeding');
+                const result = await response.json();
 
-            if (filtered.length === 0) {
-                document.getElementById('feedingGrid').innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
-                        <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
-                        <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
-                    </div>`;
-            } else {
-                filtered.forEach(r => renderCard(r));
+                if (result.success) {
+                    const list = result.data || [];
+                    document.getElementById('feedingGrid').innerHTML = '';
+
+                    const filtered = list.filter(r => {
+                        const name = (r.cattle_name || '').toLowerCase();
+                        const code = (r.cattle_code || '').toLowerCase();
+                        const notes = (r.notes || '').toLowerCase();
+                        const matchSearch = name.includes(s) || code.includes(s);
+                        const matchType = fType === 'all' || notes.includes(fType.toLowerCase());
+                        return matchSearch && matchType;
+                    });
+
+                    if (filtered.length === 0) {
+                        document.getElementById('feedingGrid').innerHTML = `
+                            <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+                                <div class="bg-gray-100 p-6 rounded-full mb-4"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-300"></i></div>
+                                <p class="text-xl font-medium">ไม่พบข้อมูลที่ค้นหา</p>
+                            </div>`;
+                    } else {
+                        filtered.forEach(r => renderCard(r));
+                    }
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                document.getElementById('feedingGrid').innerHTML = '<div class="col-span-full text-center py-10 text-red-400">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
             }
         }
 
-        function editCard(recordId) {
-            const list = JSON.parse(localStorage.getItem('cattleFeedingData')) || [];
-            const rec = list.find(r => r.recordId === recordId);
-            if (rec) {
-                editId = recordId;
-                document.getElementById('inputID').value = rec.id;
-                document.getElementById('inputName').value = rec.name;
-                document.getElementById('inputBreed').value = rec.breed;
-                document.getElementById('inputPen').value = rec.pen;
-                document.getElementById('inputDate').value = rec.date;
-                document.getElementById('inputFeedType').value = rec.feedType;
-                document.getElementById('inputAmount').value = rec.amount;
-                document.getElementById('inputCost').value = rec.cost;
-                document.getElementById('inputOfficer').value = rec.officer;
-                currentCowImage = rec.image;
-                document.getElementById('cowPreview').src = rec.image || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
-                toggleModal();
+        async function editCard(recordId) {
+            try {
+                const response = await fetch('/api/feeding');
+                const result = await response.json();
+                if (result.success) {
+                    const rec = result.data.find(r => r.id == recordId);
+                    if (rec) {
+                        editId = recordId;
+                        document.getElementById('inputID').value = rec.cattle_code || rec.cattle_id;
+                        document.getElementById('inputName').value = rec.cattle_name || '';
+                        document.getElementById('inputBreed').value = rec.breed || '';
+                        document.getElementById('inputDate').value = rec.feed_date ? rec.feed_date.split('T')[0] : '';
+                        document.getElementById('inputAmount').value = rec.quantity || '';
+                        document.getElementById('inputCost').value = rec.cost || '';
+
+                        // Parse notes to get feed type and officer
+                        if (rec.notes) {
+                            const parts = rec.notes.split(' - ');
+                            const feedType = parts[0] || '';
+                            const officer = parts.slice(1).join(' - ') || '';
+                            document.getElementById('inputFeedType').value = feedType;
+                            document.getElementById('inputOfficer').value = officer;
+                        } else {
+                            document.getElementById('inputFeedType').value = '';
+                            document.getElementById('inputOfficer').value = '';
+                        }
+
+                        // Fetch cattle data for pen (source)
+                        try {
+                            const cattleRes = await fetch(`/api/cattle/${rec.cattle_code || rec.cattle_id}`);
+                            const cattleData = await cattleRes.json();
+                            if (cattleData.success && cattleData.data) {
+                                document.getElementById('inputPen').value = cattleData.data.source || '';
+                            }
+                        } catch (e) {
+                            document.getElementById('inputPen').value = '';
+                        }
+
+                        currentCowImage = rec.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+                        document.getElementById('cowPreview').src = currentCowImage;
+                        toggleModal();
+                    }
+                }
+            } catch (error) {
+                console.error('Edit error:', error);
             }
         }
 
-        function deleteCard(recordId) {
+        async function deleteCard(recordId) {
             if (confirm("ต้องการลบรายการนี้หรือไม่?")) {
-                let list = JSON.parse(localStorage.getItem('cattleFeedingData')) || [];
-                list = list.filter(r => r.recordId !== recordId);
-                localStorage.setItem('cattleFeedingData', JSON.stringify(list));
-                filterFeedingData();
+                try {
+                    const response = await fetch(`/api/feeding/${recordId}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.success) {
+                        filterFeedingData();
+                    } else {
+                        alert(result.message || 'เกิดข้อผิดพลาด');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    alert('เกิดข้อผิดพลาดในการลบ');
+                }
             }
         }
 

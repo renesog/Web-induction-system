@@ -91,6 +91,12 @@ body {
     transform: scale(1.1);
 }
 
+/* Left-align content instead of centering */
+.max-w-7xl {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
 .search-input {
     width: 100%;
     padding: 12px 20px;

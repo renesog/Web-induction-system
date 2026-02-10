@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการผู้ใช้ - Admin Panel</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="style5.css">
+    <script src="auth.js"></script>
+</head>
+
+<body class="flex bg-[#f9fbf9]">
+
+    <aside class="sidebar">
+        <a href="index.html" class="flex flex-col items-center mb-10 hover:opacity-80 transition cursor-pointer">
+            <img src="image/cow 1.png" class="w-16 mb-4 opacity-90" alt="Logo">
+            <h2 class="text-white font-bold text-xl tracking-wide">Induction System</h2>
+        </a>
+
+        <nav class="space-y-2 px-2" id="mainNav">
+            <a href="index.html" class="nav-link" id="nav-dashboard">
+                <i class="fa-solid fa-house w-6 text-center mr-2"></i> หน้าหลัก
+            </a>
+            <a href="cattle_info.html" class="nav-link" id="nav-cattle">
+                <i class="fa-solid fa-cow w-6 text-center mr-2"></i> บันทึกข้อมูลโค
+            </a>
+            <a href="feeding.html" class="nav-link" id="nav-feeding">
+                <i class="fa-solid fa-wheat-awn w-6 text-center mr-2"></i> ข้อมูลการให้อาหาร
+            </a>
+            <a href="growth.html" class="nav-link" id="nav-growth">
+                <i class="fa-solid fa-chart-line w-6 text-center mr-2"></i> ข้อมูลการเจริญเติบโต
+            </a>
+            <a href="health.html" class="nav-link" id="nav-health">
+                <i class="fa-solid fa-heart-pulse w-6 text-center mr-2"></i> ข้อมูลสุขภาพและการดูแล
+            </a>
+            <a href="admin.html" class="nav-link active" id="nav-admin">
+                <i class="fa-solid fa-user-shield w-6 text-center mr-2"></i> จัดการผู้ใช้
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <main class="main-content">
+
+        <header class="header shadow-sm relative z-50" style="background-color: #85C38C;">
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="relative">
+                <button id="profileBtn"
+                    class="w-[45px] h-[45px] bg-white rounded-full flex items-center justify-center text-lg cursor-pointer hover:scale-110 transition shadow-md focus:outline-none">
+                    <i class="fa-regular fa-user text-gray-600"></i>
+                </button>
+
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 transform origin-top-right transition-all z-50 overflow-hidden">
+                    <a href="profile.html"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition">
+                        <i class="fa-regular fa-circle-user mr-3 text-lg"></i>
+                        <span class="font-medium">โปรไฟล์</span>
+                    </a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#" onclick="logout(); return false;"
+                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket mr-3 text-lg"></i>
+                        <span class="font-medium">ออกจากระบบ</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <h1 class="text-3xl font-bold text-[#2D4A31] mb-8 border-l-8 border-[#85C38C] pl-4">
+                <i class="fa-solid fa-user-shield mr-3"></i>จัดการผู้ใช้งาน (Admin Panel)
+            </h1>
+
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">ผู้ใช้ทั้งหมด</p>
+                        <h2 id="totalUsers" class="text-3xl font-bold text-gray-800 mt-1">0</h2>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">เจ้าของฟาร์ม</p>
+                        <h2 id="ownerCount" class="text-3xl font-bold text-gray-800 mt-1">0</h2>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                        <i class="fa-solid fa-crown text-xl"></i>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">สัตวแพทย์</p>
+                        <h2 id="doctorCount" class="text-3xl font-bold text-gray-800 mt-1">0</h2>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                        <i class="fa-solid fa-user-doctor text-xl"></i>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">พนักงาน</p>
+                        <h2 id="staffCount" class="text-3xl font-bold text-gray-800 mt-1">0</h2>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600">
+                        <i class="fa-solid fa-user-tie text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="ค้นหาผู้ใช้..."
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#85C38C] focus:ring-2 focus:ring-[#85C38C]/20 outline-none transition">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <select id="roleFilter"
+                        class="px-4 py-3 rounded-xl border border-gray-200 focus:border-[#85C38C] focus:ring-2 focus:ring-[#85C38C]/20 outline-none transition">
+                        <option value="">ทุก Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="owner">เจ้าของฟาร์ม</option>
+                        <option value="doctor">สัตวแพทย์</option>
+                        <option value="staff">พนักงาน</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-[#85C38C] text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-semibold">#</th>
+                                <th class="px-6 py-4 text-left font-semibold">ชื่อผู้ใช้</th>
+                                <th class="px-6 py-4 text-left font-semibold">อีเมล</th>
+                                <th class="px-6 py-4 text-left font-semibold">ชื่อ-นามสกุล</th>
+                                <th class="px-6 py-4 text-left font-semibold">Role</th>
+                                <th class="px-6 py-4 text-left font-semibold">วันที่สร้าง</th>
+                                <th class="px-6 py-4 text-center font-semibold">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody" class="divide-y divide-gray-100">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit User Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform scale-95 opacity-0 transition-all duration-300"
+            id="editModalContent">
+            <div class="bg-gradient-to-r from-[#85C38C] to-[#A8D5BA] p-6 rounded-t-2xl">
+                <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fa-solid fa-user-pen mr-3"></i>
+                    แก้ไขข้อมูลผู้ใช้
+                </h3>
+            </div>
+            <form id="editUserForm" class="p-6 space-y-4">
+                <input type="hidden" id="editUserId">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+                    <input type="text" id="editUsername" readonly
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
+                    <input type="email" id="editEmail"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#85C38C] focus:ring-2 focus:ring-[#85C38C]/20 outline-none transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
+                        <input type="text" id="editFirstName"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#85C38C] focus:ring-2 focus:ring-[#85C38C]/20 outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
+                        <input type="text" id="editLastName"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#85C38C] focus:ring-2 focus:ring-[#85C38C]/20 outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select id="editRole"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#85C38C] focus:ring-2 focus:ring-[#85C38C]/20 outline-none transition">
+                        <option value="admin">Admin</option>
+                        <option value="owner">เจ้าของฟาร์ม (Owner)</option>
+                        <option value="doctor">สัตวแพทย์ (Doctor)</option>
+                        <option value="staff">พนักงาน (Staff)</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeEditModal()"
+                        class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">
+                        ยกเลิก
+                    </button>
+                    <button type="submit"
+                        class="flex-1 px-6 py-3 rounded-xl bg-[#85C38C] text-white font-medium hover:bg-[#6ba872] transition">
+                        <i class="fa-solid fa-save mr-2"></i>บันทึก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 text-center transform scale-95 opacity-0 transition-all duration-300"
+            id="deleteModalContent">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-trash text-3xl text-red-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">ยืนยันการลบ</h3>
+            <p class="text-gray-600 mb-6">คุณต้องการลบผู้ใช้ <span id="deleteUserName"
+                    class="font-semibold text-red-500"></span> ใช่หรือไม่?</p>
+            <input type="hidden" id="deleteUserId">
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">
+                    ยกเลิก
+                </button>
+                <button onclick="confirmDelete()"
+                    class="flex-1 px-6 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition">
+                    <i class="fa-solid fa-trash mr-2"></i>ลบ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        let allUsers = [];
+        let currentUser = null;
+
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        // Get role badge HTML
+        function getRoleBadge(role) {
+            const badges = {
+                'admin': '<span class="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700"><i class="fa-solid fa-shield-halved mr-1"></i>Admin</span>',
+                'owner': '<span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><i class="fa-solid fa-crown mr-1"></i>เจ้าของ</span>',
+                'doctor': '<span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><i class="fa-solid fa-user-doctor mr-1"></i>สัตวแพทย์</span>',
+                'staff': '<span class="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><i class="fa-solid fa-user-tie mr-1"></i>พนักงาน</span>'
+            };
+            return badges[role] || `<span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">${role}</span>`;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Load users from API
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const result = await response.json();
+
+                if (result.success) {
+                    allUsers = result.data;
+                    renderUsers(allUsers);
+                    updateStats(allUsers);
+                }
+            } catch (error) {
+                console.error('Load users error:', error);
+            }
+        }
+
+        // Render users table
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <i class="fa-solid fa-users-slash text-4xl mb-3 block"></i>
+                            ไม่พบข้อมูลผู้ใช้
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map((user, index) => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-gray-600">${index + 1}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-[#85C38C] rounded-full flex items-center justify-center text-white font-bold">
+                                ${(user.username || '?').charAt(0).toUpperCase()}
+                            </div>
+                            <span class="font-medium text-gray-800">${user.username || '-'}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600">${user.email || '-'}</td>
+                    <td class="px-6 py-4 text-gray-600">${(user.first_name || '') + ' ' + (user.last_name || '') || '-'}</td>
+                    <td class="px-6 py-4">${getRoleBadge(user.role)}</td>
+                    <td class="px-6 py-4 text-gray-600">${formatDate(user.created_at)}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="openEditModal(${user.id})" 
+                                class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition" title="แก้ไข">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="openDeleteModal(${user.id}, '${user.username}')" 
+                                class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition ${user.id === currentUser?.id ? 'opacity-50 cursor-not-allowed' : ''}" 
+                                title="ลบ" ${user.id === currentUser?.id ? 'disabled' : ''}>
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats(users) {
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('ownerCount').textContent = users.filter(u => u.role === 'owner').length;
+            document.getElementById('doctorCount').textContent = users.filter(u => u.role === 'doctor').length;
+            document.getElementById('staffCount').textContent = users.filter(u => u.role === 'staff').length;
+        }
+
+        // Filter users
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const roleFilter = document.getElementById('roleFilter').value;
+
+            let filtered = allUsers;
+
+            if (searchTerm) {
+                filtered = filtered.filter(u =>
+                    (u.username || '').toLowerCase().includes(searchTerm) ||
+                    (u.email || '').toLowerCase().includes(searchTerm) ||
+                    (u.first_name || '').toLowerCase().includes(searchTerm) ||
+                    (u.last_name || '').toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (roleFilter) {
+                filtered = filtered.filter(u => u.role === roleFilter);
+            }
+
+            renderUsers(filtered);
+        }
+
+        // Edit Modal Functions
+        function openEditModal(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.username || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editFirstName').value = user.first_name || '';
+            document.getElementById('editLastName').value = user.last_name || '';
+            document.getElementById('editRole').value = user.role || 'staff';
+
+            const modal = document.getElementById('editModal');
+            const content = document.getElementById('editModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            const content = document.getElementById('editModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Delete Modal Functions
+        function openDeleteModal(userId, username) {
+            document.getElementById('deleteUserId').value = userId;
+            document.getElementById('deleteUserName').textContent = username;
+
+            const modal = document.getElementById('deleteModal');
+            const content = document.getElementById('deleteModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            const content = document.getElementById('deleteModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Save user changes
+        document.getElementById('editUserForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('editUserId').value;
+            const data = {
+                email: document.getElementById('editEmail').value,
+                first_name: document.getElementById('editFirstName').value,
+                last_name: document.getElementById('editLastName').value,
+                role: document.getElementById('editRole').value
+            };
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('บันทึกข้อมูลสำเร็จ!');
+                    closeEditModal();
+                    loadUsers();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาดในการบันทึก');
+                }
+            } catch (error) {
+                console.error('Save user error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึก');
+            }
+        });
+
+        // Delete user
+        async function confirmDelete() {
+            const userId = document.getElementById('deleteUserId').value;
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('ลบผู้ใช้สำเร็จ!');
+                    closeDeleteModal();
+                    loadUsers();
+                } else {
+                    alert(result.message || 'เกิดข้อผิดพลาดในการลบ');
+                }
+            } catch (error) {
+                console.error('Delete user error:', error);
+                alert('เกิดข้อผิดพลาดในการลบ');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filterUsers);
+        document.getElementById('roleFilter').addEventListener('change', filterUsers);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            const userSession = sessionStorage.getItem('currentUser');
+            if (userSession) {
+                currentUser = JSON.parse(userSession);
+            }
+            loadUsers();
+        });
+    </script>
+</body>
+
+</html>

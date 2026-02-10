@@ -32,7 +32,7 @@
             <option value="">-- Select Role --</option>
             <option value="doctor">Veterinarian (สัตวแพทย์)</option>
             <option value="owner">Farm Owner (เจ้าของฟาร์ม)</option>
-            <option value="data">Staff (พนักงาน)</option>
+            <option value="staff">Staff (พนักงาน)</option>
           </select>
 
           <button type="submit" class="login-btn">Register</button>
@@ -42,7 +42,7 @@
         </div>
       </div>
       <script>
-        function handleRegister(event) {
+        async function handleRegister(event) {
           event.preventDefault();
           const username = document.getElementById('username').value.trim();
           const email = document.getElementById('email').value.trim();
@@ -66,34 +66,27 @@
             return false;
           }
 
-          // Create username with role suffix
-          const usernameWithRole = username + '@' + role;
+          try {
+            const response = await fetch('/api/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ username, email, password, role })
+            });
 
-          // Get existing users from localStorage or create empty array
-          let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            const data = await response.json();
 
-          // Check if username already exists
-          const existingUser = users.find(u => u.username === usernameWithRole || u.email === email);
-          if (existingUser) {
-            alert('ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้แล้ว');
-            return false;
+            if (data.success) {
+              alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');
+              window.location.href = 'login.html';
+            } else {
+              alert(data.message || 'เกิดข้อผิดพลาดในการลงทะเบียน');
+            }
+          } catch (error) {
+            console.error('Register error:', error);
+            alert('เกิดข้อผิดพลาดในการลงทะเบียน');
           }
-
-          // Add new user
-          const newUser = {
-            username: usernameWithRole,
-            email: email,
-            password: password,
-            role: role,
-            createdAt: new Date().toISOString()
-          };
-          users.push(newUser);
-
-          // Save to localStorage
-          localStorage.setItem('registeredUsers', JSON.stringify(users));
-
-          alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');
-          window.location.href = 'login.html';
           return false;
         }
       </script>
