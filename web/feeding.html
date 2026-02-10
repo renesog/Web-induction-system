@@ -167,12 +167,8 @@
                             type="number" id="inputAmount" class="w-full p-2 border rounded-lg"></div>
                     <div class="space-y-1"><label class="font-bold text-gray-700">ต้นทุน (บาท) :</label><input
                             type="number" id="inputCost" class="w-full p-2 border rounded-lg"></div>
-<<<<<<< HEAD
                     <div class="space-y-1 col-span-full"><label class="font-bold text-gray-700">เจ้าหน้าที่ผู้ให้
                             :</label><input type="text" id="inputOfficer" class="w-full p-2 border rounded-lg"></div>
-=======
-
->>>>>>> main
                 </div>
             </div>
 
@@ -196,15 +192,6 @@
 
         let editId = null;
         let currentCowImage = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
-<<<<<<< HEAD
-=======
-
-        // แปลง role เป็นภาษาไทย
-        function getRoleThai(role) {
-            const roles = { 'admin': 'ผู้ดูแลระบบ', 'doctor': 'สัตวแพทย์', 'owner': 'เจ้าของฟาร์ม', 'staff': 'เจ้าหน้าที่', 'data': 'เจ้าหน้าที่บันทึกข้อมูล' };
-            return roles[role] || role || '-';
-        }
->>>>>>> main
         window.onload = () => filterFeedingData();
 
         // --- 2. Pull Data Function ---
@@ -257,24 +244,13 @@
 
             if (!feedDate || !quantity) return alert("กรุณากรอกวันที่และปริมาณอาหาร");
 
-<<<<<<< HEAD
-=======
-            // ดึงชื่อผู้ใช้จาก session
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-            const officerName = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim() || currentUser.username || '';
-            const roleThai = getRoleThai(currentUser.role);
-
->>>>>>> main
             const data = {
                 cattle_id: id,
                 feed_date: feedDate,
                 quantity: parseFloat(quantity) || 0,
                 cost: parseFloat(document.getElementById('inputCost').value) || 0,
-<<<<<<< HEAD
-                notes: document.getElementById('inputFeedType').value + ' - ' + (document.getElementById('inputOfficer').value || ''),
-=======
-                notes: document.getElementById('inputFeedType').value + ' | ' + officerName + ' [' + roleThai + ']',
->>>>>>> main
+                notes: document.getElementById('inputFeedType').value || '',
+                recorded_by: document.getElementById('inputOfficer').value || null,
                 unit: 'kg'
             };
 
@@ -313,22 +289,10 @@
             const name = rec.cattle_name || rec.name || '-';
             const cattleCode = rec.cattle_code || rec.id || '-';
             const breed = rec.breed || '-';
-<<<<<<< HEAD
-            const feedType = rec.feed_type_name || rec.notes || '-';
-=======
             const notesRaw = rec.feed_type_name || rec.notes || '-';
             // แยก feedType และข้อมูลผู้กรอก
-            const notesParts = notesRaw.split(' | ');
+            const notesParts = notesRaw.split(' - ');
             const feedType = notesParts[0] || '-';
-            let recorderInfo = notesParts[1] || '-';
-            let recorderName = '-';
-            let recorderRole = '';
-            if (recorderInfo !== '-') {
-                const roleMatch = recorderInfo.match(/(.+?)\s*\[(.+?)\]/);
-                if (roleMatch) { recorderName = roleMatch[1].trim(); recorderRole = roleMatch[2]; }
-                else { recorderName = recorderInfo.trim(); }
-            }
->>>>>>> main
             const date = rec.feed_date ? new Date(rec.feed_date).toLocaleDateString('th-TH') : '-';
             const recordId = rec.id || rec.recordId;
 
@@ -349,13 +313,6 @@
                         <p class="font-bold text-gray-800"><i class="fa-solid fa-bowl-rice text-orange-500 mr-2"></i> ${feedType}</p>
                         <p><i class="fa-solid fa-weight-hanging text-gray-400 mr-2 w-4"></i> ${rec.quantity || 0} กก.</p>
                         <p><i class="fa-solid fa-coins text-gray-400 mr-2 w-4"></i> ${rec.cost || 0} บาท</p>
-<<<<<<< HEAD
-=======
-                        <div class="bg-indigo-50 rounded-lg px-3 py-2 mt-2 border border-indigo-100">
-                            <p class="text-xs text-indigo-700"><i class="fa-solid fa-user-pen mr-1"></i> ผู้กรอก: <strong>${recorderName}</strong></p>
-                            ${recorderRole ? `<p class="text-xs text-indigo-500 mt-0.5"><i class="fa-solid fa-id-badge mr-1"></i> ตำแหน่ง: ${recorderRole}</p>` : ''}
-                        </div>
->>>>>>> main
                         
                         <div class="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
                             <button onclick="editCard('${recordId}')" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-blue-600 transition"><i class="fa-solid fa-pen text-xs"></i></button>
@@ -420,27 +377,9 @@
                         document.getElementById('inputAmount').value = rec.quantity || '';
                         document.getElementById('inputCost').value = rec.cost || '';
 
-<<<<<<< HEAD
-                        // Parse notes to get feed type and officer
-                        if (rec.notes) {
-                            const parts = rec.notes.split(' - ');
-                            const feedType = parts[0] || '';
-                            const officer = parts.slice(1).join(' - ') || '';
-                            document.getElementById('inputFeedType').value = feedType;
-                            document.getElementById('inputOfficer').value = officer;
-                        } else {
-                            document.getElementById('inputFeedType').value = '';
-                            document.getElementById('inputOfficer').value = '';
-=======
-                        // Parse notes to get feed type
-                        if (rec.notes) {
-                            const parts = rec.notes.split(' - ');
-                            const feedType = parts[0] || '';
-                            document.getElementById('inputFeedType').value = feedType;
-                        } else {
-                            document.getElementById('inputFeedType').value = '';
->>>>>>> main
-                        }
+                        // Set feed type and officer from separate fields
+                        document.getElementById('inputFeedType').value = rec.notes || '';
+                        document.getElementById('inputOfficer').value = rec.recorded_by || '';
 
                         // Fetch cattle data for pen (source)
                         try {
