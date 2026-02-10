@@ -48,29 +48,15 @@
             const data = await response.json();
 
             if (data.success) {
-              //dadad
+              // Save current user to sessionStorage
               const currentUser = {
                 ...data.user,
                 loginTime: new Date().toISOString()
               };
               sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-              // Redirect to dashboard
-              window.location.href = 'index.html';
-            } else {
-              alert(data.message || 'ชื่อผู้kaiใช้หรือรหัสผ่านไม่ถูกต้อง');
-            }
-          } catch (error) {
-            console.error('Login error:', error);
-            alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
-          }
-          return false;
-        }
-      </script>
-    </div>
-    <div class="right"></div>
-  </div>
-  <script src="login.js"></script>
-</body>
-
-</html>
+fadsfadsfasfasfas;klsjf;klsajf;ksf;klsajfda
+asdasdasd
+asdasdasdasd
+asdasdasdgva
+asdasdasdasffffff
