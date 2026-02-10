@@ -162,8 +162,12 @@
 
                     <div class="space-y-1"><label class="font-bold text-gray-700">ค่าใช้จ่าย (บาท) :</label><input
                             type="number" id="inputCost" class="w-full p-2 border rounded-lg" placeholder="0"></div>
+<<<<<<< HEAD
                     <div class="space-y-1"><label class="font-bold text-gray-700">สัตวแพทย์/ผู้ตรวจ :</label><input
                             type="text" id="inputOfficer" class="w-full p-2 border rounded-lg"></div>
+=======
+
+>>>>>>> main
                 </div>
             </div>
 
@@ -187,6 +191,15 @@
 
         let editId = null;
         let currentCowImage = "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
+<<<<<<< HEAD
+=======
+
+        // แปลง role เป็นภาษาไทย
+        function getRoleThai(role) {
+            const roles = { 'admin': 'ผู้ดูแลระบบ', 'doctor': 'สัตวแพทย์', 'owner': 'เจ้าของฟาร์ม', 'staff': 'เจ้าหน้าที่', 'data': 'เจ้าหน้าที่บันทึกข้อมูล' };
+            return roles[role] || role || '-';
+        }
+>>>>>>> main
         window.onload = () => filterHealthData();
 
         // --- 2. Pull Data Function (ใช้ API) ---
@@ -253,7 +266,16 @@
             const symptoms = document.getElementById('inputSymptoms').value;
             const treatment = document.getElementById('inputTreatment').value;
             const cost = parseFloat(document.getElementById('inputCost').value) || 0;
+<<<<<<< HEAD
             const veterinarian = document.getElementById('inputOfficer').value;
+=======
+
+            // ดึงชื่อผู้ใช้จาก session
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            const vetName = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim() || currentUser.username || '';
+            const roleThai = getRoleThai(currentUser.role);
+            const veterinarian = vetName + ' [' + roleThai + ']';
+>>>>>>> main
 
             if (!cattle_id || !record_date) {
                 return alert("กรุณาระบุ ID โค และวันที่ตรวจ/รักษา");
@@ -315,7 +337,20 @@
                         <p><i class="fa-solid fa-stethoscope text-green-600 w-5"></i> <strong>อาการ :</strong> ${rec.symptoms || '-'}</p>
                         <p><i class="fa-solid fa-syringe text-green-600 w-5"></i> <strong>รักษา :</strong> ${rec.treatment || '-'}</p>
                         <p><i class="fa-solid fa-coins text-green-600 w-5"></i> <strong>ค่าใช้จ่าย :</strong> ${rec.cost || 0} บาท</p>
+<<<<<<< HEAD
                         <p class="text-xs text-gray-400 mt-2">ผู้ตรวจ: ${rec.veterinarian || '-'}</p>
+=======
+                        ${(() => {
+                    const vt = rec.veterinarian || '-';
+                    const m = vt.match(/(.+?)\s*\[(.+?)\]/);
+                    const vName = m ? m[1].trim() : vt;
+                    const vRole = m ? m[2] : '';
+                    return `<div class="bg-indigo-50 rounded-lg px-3 py-2 mt-2 border border-indigo-100">
+                                <p class="text-xs text-indigo-700"><i class="fa-solid fa-user-pen mr-1"></i> ผู้กรอก: <strong>${vName}</strong></p>
+                                ${vRole ? `<p class="text-xs text-indigo-500 mt-0.5"><i class="fa-solid fa-id-badge mr-1"></i> ตำแหน่ง: ${vRole}</p>` : ''}
+                            </div>`;
+                })()}
+>>>>>>> main
                         
                         <div class="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
                             <button onclick="editCard(${rec.id})" class="w-8 h-8 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-blue-600 hover:border-blue-300 transition"><i class="fa-solid fa-pen text-xs"></i></button>
@@ -385,7 +420,11 @@
                         document.getElementById('inputSymptoms').value = rec.symptoms || '';
                         document.getElementById('inputTreatment').value = rec.treatment || '';
                         document.getElementById('inputCost').value = rec.cost || '';
+<<<<<<< HEAD
                         document.getElementById('inputOfficer').value = rec.veterinarian || '';
+=======
+
+>>>>>>> main
                         currentCowImage = rec.image_url || "https://cdn-icons-png.flaticon.com/512/1998/1998610.png";
                         document.getElementById('healthPreview').src = currentCowImage;
                         toggleModal();
