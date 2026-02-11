@@ -774,11 +774,23 @@ app.put('/api/growth/:id', async (req, res) => {
             cattle_id, initial_weight, latest_weight, record_date, recorded_by
         } = req.body;
 
+        // Find actual cattle id (in case cattle_code was sent)
+        const [cattle] = await pool.query(
+            'SELECT id FROM cattle WHERE id = ? OR cattle_code = ?',
+            [cattle_id, cattle_id]
+        );
+
+        if (cattle.length === 0) {
+            return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลโค' });
+        }
+
+        const actualCattleId = cattle[0].id;
+
         const [result] = await pool.query(
             `UPDATE growth_records SET 
              cattle_id = ?, initial_weight = ?, latest_weight = ?, record_date = ?, recorded_by = ?
              WHERE id = ?`,
-            [cattle_id, initial_weight || null, latest_weight || null, record_date, recorded_by || null, id]
+            [actualCattleId, initial_weight || null, latest_weight || null, record_date, recorded_by || null, id]
         );
 
         if (result.affectedRows === 0) {
@@ -904,11 +916,23 @@ app.put('/api/health/:id', async (req, res) => {
             cattle_id, record_date, health_status, symptoms, treatment, cost, veterinarian
         } = req.body;
 
+        // Find actual cattle id (in case cattle_code was sent)
+        const [cattle] = await pool.query(
+            'SELECT id FROM cattle WHERE id = ? OR cattle_code = ?',
+            [cattle_id, cattle_id]
+        );
+
+        if (cattle.length === 0) {
+            return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลโค' });
+        }
+
+        const actualCattleId = cattle[0].id;
+
         const [result] = await pool.query(
             `UPDATE health_records SET 
              cattle_id = ?, record_date = ?, health_status = ?, symptoms = ?, treatment = ?, cost = ?, veterinarian = ?
              WHERE id = ?`,
-            [cattle_id, record_date, health_status || 'normal', symptoms || null, treatment || null, cost || 0, veterinarian || null, id]
+            [actualCattleId, record_date, health_status || 'normal', symptoms || null, treatment || null, cost || 0, veterinarian || null, id]
         );
 
         if (result.affectedRows === 0) {
