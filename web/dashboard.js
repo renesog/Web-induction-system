@@ -105,11 +105,10 @@ function showRoleBasedSections(role) {
 }
 
 // Welcome Message Function (using sessionStorage for logged-in user)
-function loadWelcomeMessage() {
+async function loadWelcomeMessage() {
   const currentUser = checkSession();
   if (!currentUser) return;
 
-  const savedImage = localStorage.getItem('userProfileImage');
   const welcomeBanner = document.getElementById('welcomeBanner');
   const welcomeText = document.getElementById('welcomeText');
   const welcomeProfileImage = document.getElementById('welcomeProfileImage');
@@ -123,11 +122,17 @@ function loadWelcomeMessage() {
     welcomeText.textContent = 'ยินดีต้อนรับ ' + usernameWithoutRole + ' (' + roleDisplayName + ')';
     welcomeBanner.classList.remove('hidden');
 
-    // Load profile image if available
-    if (savedImage && welcomeProfileImage && welcomeDefaultIcon) {
-      welcomeProfileImage.src = savedImage;
-      welcomeProfileImage.classList.remove('hidden');
-      welcomeDefaultIcon.classList.add('hidden');
+    // Load profile image from API
+    try {
+      const response = await fetch(`/api/profile/${currentUser.id}`);
+      const result = await response.json();
+      if (result.success && result.data.profile_image && welcomeProfileImage && welcomeDefaultIcon) {
+        welcomeProfileImage.src = result.data.profile_image;
+        welcomeProfileImage.classList.remove('hidden');
+        welcomeDefaultIcon.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('Error loading profile image:', error);
     }
   }
 

@@ -238,9 +238,17 @@
             });
         });
 
-        // Check if user is owner
+        // Check if user is owner or admin
         function isOwner() {
             return currentUser && currentUser.role === 'owner';
+        }
+
+        function isAdmin() {
+            return currentUser && currentUser.role === 'admin';
+        }
+
+        function canEditFarm() {
+            return isOwner() || isAdmin();
         }
 
         // Apply role-based UI
@@ -248,12 +256,12 @@
             const farmNameField = document.getElementById('farmName');
             const farmNameContainer = farmNameField ? farmNameField.closest('.space-y-1') : null;
 
-            if (!isOwner()) {
-                // Only disable farm name field for non-owners
+            if (!canEditFarm()) {
+                // Only disable farm name field for non-owners/non-admins
                 if (farmNameField) {
                     farmNameField.readOnly = true;
                     farmNameField.style.backgroundColor = '#f0f0f0';
-                    farmNameField.placeholder = 'เฉพาะเจ้าของฟาร์มเท่านั้นที่แก้ไขได้';
+                    farmNameField.placeholder = 'เฉพาะเจ้าของฟาร์มหรือแอดมินเท่านั้นที่แก้ไขได้';
                 }
             }
         }
@@ -330,8 +338,8 @@
 
                 const data = await response.json();
 
-                // If owner, also save farm settings
-                if (isOwner()) {
+                // If owner or admin, also save farm settings
+                if (canEditFarm()) {
                     const farmData = {
                         farm_name: document.getElementById('farmName').value,
                         requester_role: currentUser.role

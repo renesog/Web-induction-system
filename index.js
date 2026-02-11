@@ -192,7 +192,7 @@ app.get('/api/profile/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const [users] = await pool.query(
-            'SELECT id, username, email, role, first_name, last_name, phone, farm_name, profile_image FROM users WHERE id = ?',
+            'SELECT id, username, email, role, first_name, last_name, phone, profile_image FROM users WHERE id = ?',
             [id]
         );
 
@@ -207,25 +207,24 @@ app.get('/api/profile/:id', async (req, res) => {
     }
 });
 
-// Update user profile (all roles can edit, but only owner can edit farm_name)
+// Update user profile
 app.put('/api/profile/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { first_name, last_name, phone, farm_name, profile_image, requester_role } = req.body;
+        const { first_name, last_name, phone, profile_image, requester_role } = req.body;
 
-        // Only owner can update farm_name
+        // All roles can update their own profile fields
         if (requester_role === 'owner') {
-            // Owner can update all fields including farm_name
             const [result] = await pool.query(
-                `UPDATE users SET first_name = ?, last_name = ?, phone = ?, farm_name = ?, profile_image = ? WHERE id = ?`,
-                [first_name || null, last_name || null, phone || null, farm_name || null, profile_image || null, id]
+                `UPDATE users SET first_name = ?, last_name = ?, phone = ?, profile_image = ? WHERE id = ?`,
+                [first_name || null, last_name || null, phone || null, profile_image || null, id]
             );
 
             if (result.affectedRows === 0) {
                 return res.status(404).json({ success: false, message: 'ไม่พบผู้ใช้' });
             }
         } else {
-            // Non-owner can update all fields EXCEPT farm_name
+            // Non-owner can update their own profile
             const [result] = await pool.query(
                 `UPDATE users SET first_name = ?, last_name = ?, phone = ?, profile_image = ? WHERE id = ?`,
                 [first_name || null, last_name || null, phone || null, profile_image || null, id]
@@ -266,23 +265,23 @@ app.get('/api/farm-settings', async (req, res) => {
 // Update farm settings (owner only)
 app.put('/api/farm-settings', async (req, res) => {
     try {
-        const { farm_name, farm_address, farm_phone, requester_role } = req.body;
+        const { farm_name, requester_role } = req.body;
 
-        // Only owner can update
-        if (requester_role !== 'owner') {
-            return res.status(403).json({ success: false, message: 'เฉพาะเจ้าของฟาร์มเท่านั้นที่สามารถแก้ไขข้อมูลฟาร์มได้' });
+        // Only owner or admin can update
+        if (requester_role !== 'owner' && requester_role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'เฉพาะเจ้าของฟาร์มหรือแอดมินเท่านั้นที่สามารถแก้ไขข้อมูลฟาร์มได้' });
         }
 
         const [result] = await pool.query(
-            'UPDATE farm_settings SET farm_name = ?, farm_address = ?, farm_phone = ? WHERE id = 1',
-            [farm_name || null, farm_address || null, farm_phone || null]
+            'UPDATE farm_settings SET farm_name = ? WHERE id = 1',
+            [farm_name || null]
         );
 
         if (result.affectedRows === 0) {
             // Insert if not exists
             await pool.query(
-                'INSERT INTO farm_settings (id, farm_name, farm_address, farm_phone) VALUES (1, ?, ?, ?)',
-                [farm_name || 'ฟาร์มโคเนื้อ', farm_address || null, farm_phone || null]
+                'INSERT INTO farm_settings (id, farm_name) VALUES (1, ?)',
+                [farm_name || 'ฟาร์มโคเนื้อ']
             );
         }
 
@@ -481,21 +480,36 @@ app.delete('/api/cattle/:id', async (req, res) => {
         // Get cattle info before delete
         const [cattleInfo] = await pool.query('SELECT cattle_code, name FROM cattle WHERE id = ?', [id]);
 
-        const [result] = await pool.query('DELETE FROM cattle WHERE id = ?', [id]);
-
-        if (result.affectedRows === 0) {
+        if (cattleInfo.length === 0) {
             return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลโค' });
         }
 
-        // Log sell transaction
-        const cattleName = cattleInfo.length > 0 ? (cattleInfo[0].name || cattleInfo[0].cattle_code) : 'Unknown';
+        const cattleName = cattleInfo[0].name || cattleInfo[0].cattle_code;
+
+        // Disable FK checks to preserve transaction history
+        await pool.query('SET FOREIGN_KEY_CHECKS = 0');
+
+        // Delete related records from child tables (except transactions - keep history)
+        await pool.query('DELETE FROM feeding_records WHERE cattle_id = ?', [id]);
+        await pool.query('DELETE FROM growth_records WHERE cattle_id = ?', [id]);
+        await pool.query('DELETE FROM health_records WHERE cattle_id = ?', [id]);
+
+        // Delete the cattle record
+        await pool.query('DELETE FROM cattle WHERE id = ?', [id]);
+
+        // Log sell transaction (kept permanently as history)
         await pool.query(
             'INSERT INTO cattle_transactions (cattle_id, transaction_type, transaction_date, notes) VALUES (?, ?, ?, ?)',
             [id, 'sell', new Date().toISOString().split('T')[0], `ขายโค: ${cattleName}`]
         );
 
-        res.json({ success: true, message: 'ลบข้อมูลโคสำเร็จ!' });
+        // Re-enable FK checks
+        await pool.query('SET FOREIGN_KEY_CHECKS = 1');
+
+        res.json({ success: true, message: 'ลบข้อมูลโคสำเร็จ! (บันทึกเป็นคำสั่งขาย)' });
     } catch (error) {
+        // Make sure FK checks are re-enabled even on error
+        await pool.query('SET FOREIGN_KEY_CHECKS = 1').catch(() => { });
         console.error('Delete cattle error:', error);
         res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการลบ', error: error.message });
     }
