@@ -231,6 +231,13 @@
         let editId = null;
         let base64Image = "";
 
+        // Helper: parse price from notes field
+        function parsePrice(notes) {
+            if (!notes) return 0;
+            const match = notes.match(/ราคาซื้อ:\s*([\d,.]+)/);
+            return match ? match[1] : 0;
+        }
+
 
         // Initial Load - ดึงข้อมูลจาก API
         window.onload = () => loadCattleFromAPI();
@@ -374,6 +381,7 @@
                         <p><strong>อายุ :</strong> ${ageText}</p>
                         <p><strong>วันนำเข้า :</strong> ${entryDate}</p>
                         <p><strong>คอก :</strong> ${cow.source || '-'}</p>
+                        <p><strong>ราคาซื้อเข้า :</strong> ${parsePrice(cow.notes)} บาท</p>
 
                         <div class="flex justify-end gap-2 mt-4 pt-2">
                             <button onclick="editCow(${cow.id})" class="w-8 h-8 bg-white rounded-full border border-gray-200 text-gray-600 hover:text-green-600 shadow-sm transition"><i class="fa-solid fa-pen text-xs"></i></button>
@@ -431,6 +439,10 @@
                     document.getElementById('inputStatus').value = c.status || 'พ่อพันธุ์ / แม่พันธุ์';
                     document.getElementById('inputPen').value = c.source || '';
                     document.getElementById('inputDate').value = c.entry_date ? c.entry_date.split('T')[0] : '';
+
+                    // Parse price from notes
+                    const priceFromNotes = parsePrice(c.notes);
+                    document.getElementById('inputPrice').value = priceFromNotes || '';
 
                     if (c.image_url) {
                         base64Image = c.image_url;
